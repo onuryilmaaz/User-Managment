@@ -1,0 +1,256 @@
+import User from "../models/User.js";
+
+// 📌 KULLANICI BİLGİLERİNİ AL: /api/user/me
+export const getMe = async (req, res) => {
+  try {
+    const user = req.user;
+    res.status(200).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        isVerified: user.isVerified,
+        isActive: user.isActive,
+        bio: user.bio,
+        location: user.location,
+        social: user.social,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Sunucu hatası", error: err.message });
+  }
+};
+
+// 📌 PROFİL GÜNCELLEME: /api/user/update-profile
+export const updateProfile = async (req, res) => {
+  try {
+    const user = req.user;
+
+    // Gelen isteğin body'sinden `profilePicture`'ı da alıyoruz
+    const { name, surname, bio, location, social, profilePicture } = req.body;
+
+    if (name) user.name = name;
+    if (surname) user.surname = surname;
+    if (bio) user.bio = bio;
+    if (location) user.location = location;
+    if (social) user.social = social;
+
+    // Eğer frontend'den bir profilePicture URL'i geldiyse, onu kullanıcıya ata
+    // Eğer gelmediyse, mevcut değeri koru
+    if (typeof profilePicture !== "undefined") {
+      user.profilePicture = profilePicture;
+    }
+
+    // Değişiklikleri veritabanına kaydet
+    const updatedUser = await user.save();
+
+    res.status(200).json({ message: "Profil güncellendi", user: updatedUser });
+  } catch (err) {
+    res.status(500).json({ message: "Sunucu hatası", error: err.message });
+  }
+};
+
+// 📌 KULLANICI LİSTESİ: /api/user/list (Admin ve Moderatör için)
+export const getUserList = async (req, res) => {
+  try {
+    const users = await User.find({}).select(
+      "-password -resetPasswordToken -resetPasswordExpire -refreshTokens"
+    );
+    res.status(200).json({ users });
+  } catch (err) {
+    res.status(500).json({ message: "Sunucu hatası", error: err.message });
+  }
+};
+
+// 📌 KULLANICI SİL: /api/user/delete/:id (Admin ve Moderatör için)
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Kendi kendini silmeyi engelle
+    if (req.user._id.toString() === id) {
+      return res.status(400).json({ message: "Kendi hesabınızı silemezsiniz" });
+    }
+
+    const userToDelete = await User.findById(id);
+    if (!userToDelete) {
+      return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+    }
+
+    // Moderatör admin'i silemez
+    if (req.user.role === "Moderator" && userToDelete.role === "Admin") {
+      return res
+        .status(403)
+        .json({ message: "Moderatör admin kullanıcıları silemez" });
+    }
+
+    await User.findByIdAndDelete(id);
+    res.status(200).json({ message: "Kullanıcı başarıyla silindi" });
+  } catch (err) {
+    res.status(500).json({ message: "Sunucu hatası", error: err.message });
+  }
+};
+
+// 📌 KULLANICI AKTİF/PASİF YAPMA: /api/user/toggle-status/:id (Admin ve Moderatör için)
+export const toggleUserStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Kendi durumunu değiştirmeyi engelle
+    if (req.user._id.toString() === id) {
+      return res
+        .status(400)
+        .json({ message: "Kendi hesabınızın durumunu değiştiremezsiniz" });
+    }
+
+    const userToUpdate = await User.findById(id);
+    if (!userToUpdate) {
+      return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+    }
+
+    // Moderatör admin'in durumunu değiştiremez
+    if (req.user.role === "Moderator" && userToUpdate.role === "Admin") {
+      return res
+        .status(403)
+        .json({
+          message: "Moderatör admin kullanıcılarının durumunu değiştiremez",
+        });
+    }
+
+    userToUpdate.isActive = !userToUpdate.isActive;
+    await userToUpdate.save();
+
+    res.status(200).json({
+      message: `Kullanıcı ${userToUpdate.isActive ? "aktif" : "pasif"} yapıldı`,
+      user: {
+        id: userToUpdate._id,
+        name: userToUpdate.name,
+        email: userToUpdate.email,
+        isActive: userToUpdate.isActive,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Sunucu hatası", error: err.message });
+  }
+};
+
+// 📌 KULLANICI ROLÜ DEĞİŞTİRME: /api/user/change-role/:id (Sadece Admin için)
+export const changeUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    // Geçerli roller kontrolü
+    if (!["User", "Moderator"].includes(role)) {
+      return res
+        .status(400)
+        .json({
+          message: "Geçersiz rol. Sadece 'User' veya 'Moderator' olabilir",
+        });
+    }
+
+    // Kendi rolünü değiştirmeyi engelle
+    if (req.user._id.toString() === id) {
+      return res
+        .status(400)
+        .json({ message: "Kendi rolünüzü değiştiremezsiniz" });
+    }
+
+    const userToUpdate = await User.findById(id);
+    if (!userToUpdate) {
+      return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+    }
+
+    // Admin rolünü değiştirmeyi engelle
+    if (userToUpdate.role === "Admin") {
+      return res
+        .status(403)
+        .json({ message: "Admin kullanıcılarının rolü değiştirilemez" });
+    }
+
+    userToUpdate.role = role;
+    await userToUpdate.save();
+
+    res.status(200).json({
+      message: `Kullanıcı rolü ${role} olarak güncellendi`,
+      user: {
+        id: userToUpdate._id,
+        name: userToUpdate.name,
+        email: userToUpdate.email,
+        role: userToUpdate.role,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Sunucu hatası", error: err.message });
+  }
+};
+
+// 📌 MODERATÖR ROLÜ VERME: /api/user/promote-to-moderator/:id (Sadece Admin için)
+export const promoteToModerator = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const userToPromote = await User.findById(id);
+    if (!userToPromote) {
+      return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+    }
+
+    if (userToPromote.role === "Moderator") {
+      return res.status(400).json({ message: "Kullanıcı zaten moderatör" });
+    }
+
+    if (userToPromote.role === "Admin") {
+      return res
+        .status(400)
+        .json({ message: "Admin kullanıcısının rolü değiştirilemez" });
+    }
+
+    userToPromote.role = "Moderator";
+    await userToPromote.save();
+
+    res.status(200).json({
+      message: "Kullanıcı moderatör olarak atandı",
+      user: {
+        id: userToPromote._id,
+        name: userToPromote.name,
+        email: userToPromote.email,
+        role: userToPromote.role,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Sunucu hatası", error: err.message });
+  }
+};
+
+// 📌 MODERATÖR ROLÜNÜ GERİ ALMA: /api/user/demote-from-moderator/:id (Sadece Admin için)
+export const demoteFromModerator = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const userToDemote = await User.findById(id);
+    if (!userToDemote) {
+      return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+    }
+
+    if (userToDemote.role !== "Moderator") {
+      return res.status(400).json({ message: "Kullanıcı moderatör değil" });
+    }
+
+    userToDemote.role = "User";
+    await userToDemote.save();
+
+    res.status(200).json({
+      message: "Kullanıcının moderatör yetkisi geri alındı",
+      user: {
+        id: userToDemote._id,
+        name: userToDemote.name,
+        email: userToDemote.email,
+        role: userToDemote.role,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Sunucu hatası", error: err.message });
+  }
+};
