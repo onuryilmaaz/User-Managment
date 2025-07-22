@@ -3,13 +3,15 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import sendEmail from "../utils/sendEmail.js";
+// Activity logging import'u ekle
+import { logActivity } from "./activityController.js";
 
 // 🔐 Access Token üretici (kısa süreli)
 const generateAccessToken = (user) => {
   return jwt.sign(
     { id: user._id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: "15m" } // 15 dakika
+    { expiresIn: "1h" } // 1 saat (15m yerine)
   );
 };
 
@@ -29,7 +31,7 @@ const sendTokenCookies = (res, accessToken, refreshToken) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "Lax",
-    maxAge: 15 * 60 * 1000, // 15 dakika
+    maxAge: 60 * 60 * 1000, // 1 saat (15 * 60 * 1000 yerine)
   });
 
   // Refresh token - uzun süreli
@@ -141,6 +143,14 @@ export const verifyCode = async (req, res) => {
     user.refreshTokens.push({ token: refreshToken });
     await user.save();
 
+    // Activity log ekle
+    await logActivity(
+      user._id,
+      "email_verification",
+      `Kullanıcı ${user.email} e-posta doğrulamasını tamamladı`,
+      req
+    );
+
     // Token'ları cookie'ye yaz
     sendTokenCookies(res, accessToken, refreshToken);
 
@@ -235,24 +245,30 @@ export const loginUser = async (req, res) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken();
 
-    // Refresh token'ı database'e kaydet
+    // Refresh token'ı database'e kaydet ve lastLogin'i güncelle
     user.refreshTokens.push({ token: refreshToken });
+    user.lastLogin = new Date(); // ✅ Son giriş zamanını güncelle
     await user.save();
+
+    // Activity log ekle
+    await logActivity(
+      user._id,
+      "login",
+      `Kullanıcı ${user.email} başarıyla giriş yaptı`,
+      req
+    );
 
     // Token'ları cookie'ye yaz
     sendTokenCookies(res, accessToken, refreshToken);
 
-    // --- DEĞİŞİKLİK BURADA ---
     // Frontend'e gönderilecek kullanıcı objesini hazırla
     const userForFrontend = user.toObject();
-    // Güvenlik için hassas bilgileri yanıttan kaldır
     delete userForFrontend.password;
     delete userForFrontend.refreshTokens;
-    delete userForFrontend.__v; // Mongoose'un eklediği versiyon anahtarı
+    delete userForFrontend.__v;
 
     res.status(200).json({
       message: "Giriş başarılı",
-      // Temizlenmiş ve TÜM alanları içeren kullanıcı objesini gönder
       user: userForFrontend,
       tokens: {
         accessToken,
@@ -312,7 +328,27 @@ export const logoutUser = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;
 
+    // Kullanıcıyı bul (activity log için)
+    let userId = null;
     if (refreshToken) {
+      try {
+        const user = await User.findOne({
+          "refreshTokens.token": refreshToken,
+        });
+        if (user) {
+          userId = user._id;
+          // Activity log ekle
+          await logActivity(
+            userId,
+            "logout",
+            `Kullanıcı ${user.email} çıkış yaptı`,
+            req
+          );
+        }
+      } catch (error) {
+        console.error("Logout activity log error:", error);
+      }
+
       // Refresh token'ı database'den kaldır
       await User.updateOne(
         { "refreshTokens.token": refreshToken },
@@ -341,7 +377,7 @@ const createResetToken = () => {
   return { resetToken, hashedToken, expires };
 };
 
-// 📌 1. ŞİFRE SIFIRLAMA: /api/auth/forgot-password
+// 📌 1. ŞİFREYİ SIFIRLAMA: /api/auth/forgot-password
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -352,11 +388,9 @@ export const forgotPassword = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res
-        .status(404)
-        .json({
-          message: "Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı.",
-        });
+      return res.status(404).json({
+        message: "Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı.",
+      });
     }
 
     const { resetToken, hashedToken, expires } = createResetToken();
@@ -472,7 +506,13 @@ export const resetPassword = async (req, res) => {
     user.resetPasswordExpire = undefined;
     await user.save();
 
-    console.log("Şifre başarıyla güncellendi");
+    // Activity log ekle
+    await logActivity(
+      user._id,
+      "password_reset",
+      `Kullanıcı ${user.email} şifresini sıfırladı`,
+      req
+    );
 
     res.status(200).json({
       message:
@@ -530,17 +570,37 @@ export const googleAuthCallback = async (req, res) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken();
 
-    // Refresh token'ı database'e kaydet
+    // Refresh token'ı database'e kaydet ve lastLogin'i güncelle
     user.refreshTokens.push({ token: refreshToken });
+    user.lastLogin = new Date(); // ✅ Son giriş zamanını güncelle
     await user.save();
+
+    // Activity log ekle
+    await logActivity(
+      user._id,
+      "login",
+      `Kullanıcı ${user.email} Google ile giriş yaptı`,
+      req
+    );
 
     // Token'ları cookie'ye yaz
     sendTokenCookies(res, accessToken, refreshToken);
 
-    // Frontend'e yönlendir
-    res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+    // Frontend'e gönderilecek kullanıcı objesini hazırla
+    const userForFrontend = user.toObject();
+    delete userForFrontend.password;
+    delete userForFrontend.refreshTokens;
+    delete userForFrontend.__v;
+
+    // Success sayfasına yönlendir (popup'a mesaj gönderecek)
+    const userParam = encodeURIComponent(JSON.stringify(userForFrontend));
+    res.redirect(`/success.html?user=${userParam}&token=${accessToken}`);
   } catch (err) {
-    res.status(500).json({ message: "Google auth hatası", error: err.message });
+    console.error("Google auth error:", err);
+    // Error sayfasına yönlendir
+    res.redirect(
+      `/error.html?message=${encodeURIComponent("Google ile giriş başarısız")}`
+    );
   }
 };
 

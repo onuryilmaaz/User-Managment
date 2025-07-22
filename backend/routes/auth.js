@@ -35,12 +35,13 @@ router.get("/verify-email/:token", verifyEmail);
 router.post("/verify-code", verifyCode);
 router.post("/resend-code", resendVerificationCode);
 
-
-
 // Google OAuth
 router.get(
   "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    prompt: "select_account", // Bu parametre hesap seçimi zorlar
+  })
 );
 router.get(
   "/google/callback",

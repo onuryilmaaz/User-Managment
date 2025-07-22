@@ -14,13 +14,7 @@ import { loginUser } from "@/lib/services/auth.service";
 import { useAuthStore } from "@/lib/hooks/use-auth.store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -44,26 +38,6 @@ export function LoginForm() {
     },
   });
 
-  // async function onSubmit(values: UserLoginPayload) {
-  //   setIsLoading(true);
-  //   // Eğer burada localStorage.setItem ile ilgili bir satır varsa SİL.
-
-  //   try {
-  //     const response = await loginUser(values);
-  //     toast.success(response.message);
-
-  //     // DOĞRU YÖNTEM: Token'ı ve kullanıcıyı sadece store üzerinden set et.
-  //     // Persist middleware kalanı halledecektir.
-  //     setUser(response.user);
-  //     setToken(response.tokens.accessToken);
-
-  //     router.push("/dashboard");
-  //   } catch (error: any) {
-  //     toast.error(error.message);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
   async function onSubmit(values: UserLoginPayload) {
     setIsLoading(true);
     try {
@@ -74,22 +48,20 @@ export function LoginForm() {
       setToken(response.tokens.accessToken);
 
       router.push("/dashboard");
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Giriş sırasında bir hata oluştu";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Giriş Yap</CardTitle>
-        <CardDescription>
-          Hesabınıza erişmek için bilgilerinizi girin.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Card className="border-0 shadow-lg bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
+      <CardContent className="p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -97,9 +69,15 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>E-posta</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    E-posta
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="ahmet@example.com" {...field} />
+                    <Input
+                      placeholder="ornek@email.com"
+                      className="h-10 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -110,16 +88,33 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Şifre</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Şifre
+                  </FormLabel>
                   <FormControl>
-                    <PasswordInput placeholder="••••••••" {...field} />
+                    <PasswordInput
+                      placeholder="••••••••"
+                      className="h-10 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Giriş Yapılıyor..." : "Giriş Yap"}
+            <Button
+              type="submit"
+              className="w-full h-10 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-md transition-all duration-200 shadow-md"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Giriş yapılıyor...
+                </div>
+              ) : (
+                "Giriş Yap"
+              )}
             </Button>
           </form>
         </Form>

@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import bcrypt from "bcryptjs";
 
 // 📌 KULLANICI BİLGİLERİNİ AL: /api/user/me
 export const getMe = async (req, res) => {
@@ -112,11 +113,9 @@ export const toggleUserStatus = async (req, res) => {
 
     // Moderatör admin'in durumunu değiştiremez
     if (req.user.role === "Moderator" && userToUpdate.role === "Admin") {
-      return res
-        .status(403)
-        .json({
-          message: "Moderatör admin kullanıcılarının durumunu değiştiremez",
-        });
+      return res.status(403).json({
+        message: "Moderatör admin kullanıcılarının durumunu değiştiremez",
+      });
     }
 
     userToUpdate.isActive = !userToUpdate.isActive;
@@ -144,11 +143,9 @@ export const changeUserRole = async (req, res) => {
 
     // Geçerli roller kontrolü
     if (!["User", "Moderator"].includes(role)) {
-      return res
-        .status(400)
-        .json({
-          message: "Geçersiz rol. Sadece 'User' veya 'Moderator' olabilir",
-        });
+      return res.status(400).json({
+        message: "Geçersiz rol. Sadece 'User' veya 'Moderator' olabilir",
+      });
     }
 
     // Kendi rolünü değiştirmeyi engelle
@@ -250,6 +247,52 @@ export const demoteFromModerator = async (req, res) => {
         role: userToDemote.role,
       },
     });
+  } catch (err) {
+    res.status(500).json({ message: "Sunucu hatası", error: err.message });
+  }
+};
+
+// 📌 ŞİFRE DEĞİŞTİR: /api/user/change-password
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user._id;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        message: "Mevcut şifre ve yeni şifre gerekli",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        message: "Yeni şifre en az 6 karakter olmalıdır",
+      });
+    }
+
+    // Kullanıcıyı bul (şifre dahil)
+    const user = await User.findById(userId).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+    }
+
+    // Mevcut şifreyi kontrol et
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ message: "Mevcut şifre hatalı" });
+    }
+
+    // Yeni şifreyi hash'le
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Şifreyi güncelle
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Şifre başarıyla değiştirildi" });
   } catch (err) {
     res.status(500).json({ message: "Sunucu hatası", error: err.message });
   }

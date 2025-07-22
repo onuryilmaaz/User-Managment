@@ -2,49 +2,72 @@
 
 import { useAuthStore } from "@/lib/hooks/use-auth.store";
 import Link from "next/link";
-import { Home, User, Settings, ShieldCheck } from "lucide-react";
+import { Home, User, Settings, ShieldCheck, Users } from "lucide-react";
 
 export function Sidebar() {
   const { user } = useAuthStore();
   const isAdminOrModerator =
     user?.role === "Admin" || user?.role === "Moderator";
 
-  const navItems = [
-    { href: "/dashboard", label: "Ana Sayfa", icon: Home },
-    { href: "/profile", label: "Profil", icon: User },
-    { href: "/settings", label: "Ayarlar", icon: Settings },
-  ];
-
   return (
-    <aside className="hidden md:flex flex-col w-64 p-4 border-r bg-gray-50 dark:bg-neutral-950">
-      <div className="mb-8">
-        <Link href="/dashboard" className="text-xl font-bold">
-          Proje Adı
-        </Link>
-      </div>
-      <nav className="flex flex-col gap-2">
-        {navItems.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className="flex items-center gap-3 p-2 hover:bg-gray-200 dark:hover:bg-neutral-800 rounded-md text-sm font-medium"
-          >
-            <item.icon className="h-4 w-4" />
-            {item.label}
-          </Link>
-        ))}
+    <div className="pb-12 w-64">
+      <div className="space-y-4 py-4">
+        <div className="px-3 py-2">
+          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+            Menü
+          </h2>
+          <div className="space-y-1">
+            <Link
+              href="/dashboard"
+              className="flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+            >
+              <Home className="mr-2 h-4 w-4" />
+              Ana Sayfa
+            </Link>
+            <Link
+              href="/profile"
+              className="flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+            >
+              <User className="mr-2 h-4 w-4" />
+              Profil
+            </Link>
+            <Link
+              href="/settings"
+              className="flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Ayarlar
+            </Link>
+          </div>
+        </div>
 
-        {/* Sadece Admin ve Moderatörler için Kullanıcılar linki */}
+        {/* Admin/Moderatör Menüsü */}
         {isAdminOrModerator && (
-          <Link
-            href="/admin/users"
-            className="flex items-center gap-3 p-2 hover:bg-gray-200 dark:hover:bg-neutral-800 rounded-md text-sm font-medium"
-          >
-            <ShieldCheck className="h-4 w-4" />
-            Kullanıcılar
-          </Link>
+          <div className="px-3 py-2">
+            <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+              Yönetim
+            </h2>
+            <div className="space-y-1">
+              <Link
+                href="/admin/users"
+                className="flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Kullanıcı Yönetimi
+              </Link>
+              {user?.role === "Admin" && (
+                <Link
+                  href="/admin/settings"
+                  className="flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                >
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  Sistem Ayarları
+                </Link>
+              )}
+            </div>
+          </div>
         )}
-      </nav>
-    </aside>
+      </div>
+    </div>
   );
 }

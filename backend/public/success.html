@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Google Auth Success</title>
+  </head>
+  <body>
+    <script>
+      // URL'den token ve user bilgilerini al
+      const urlParams = new URLSearchParams(window.location.search);
+      const user = JSON.parse(
+        decodeURIComponent(urlParams.get("user") || "{}")
+      );
+      const accessToken = urlParams.get("token");
+
+      // Ana pencereye mesaj gönder
+      if (window.opener) {
+        window.opener.postMessage(
+          {
+            type: "GOOGLE_AUTH_SUCCESS",
+            user: user,
+            accessToken: accessToken,
+          },
+          "http://localhost:3000"
+        );
+      }
+
+      // Popup'ı kapat
+      window.close();
+    </script>
+  </body>
+</html>

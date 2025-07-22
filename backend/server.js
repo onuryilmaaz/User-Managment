@@ -9,11 +9,9 @@ import fs from "fs";
 import swaggerUi from "swagger-ui-express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
 
-// ES module'de __dirname tanımlaması
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 // Config
 import connectDB from "./config/db.js";
@@ -59,7 +57,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/", (req, res) => {
   res.json({
     message: "🚀 MERN Auth API Çalışıyor!",
-    documentation: `http://localhost:${process.env.PORT || 8080}/api-docs`,
+    documentation: `http://localhost:${process.env.PORT || 3001}/api-docs`,
     endpoints: {
       auth: "/api/auth",
       user: "/api/user",
@@ -73,3 +71,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Sunucu ${PORT} portunda çalışıyor`);
   console.log(`📚 API Dokümantasyonu: http://localhost:${PORT}/api-docs`);
 });
+
+// Static dosyaları serve et
+app.use(express.static(path.join(__dirname, "public")));

@@ -13,13 +13,7 @@ import {
 import { registerUser } from "@/lib/services/auth.service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -51,33 +45,37 @@ export function RegisterForm() {
       const result = await registerUser(values);
       toast.success(result.message);
       router.push(`/verify-code?email=${values.email}`);
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Kayıt sırasında bir hata oluştu";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Hesap Oluştur</CardTitle>
-        <CardDescription>
-          Yeni bir hesap oluşturmak için bilgilerinizi girin.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Card className="border-0 shadow-lg bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
+      <CardContent className="p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="flex space-x-4">
+            <div className="grid grid-cols-2 gap-3">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem className="w-1/2">
-                    <FormLabel>İsim</FormLabel>
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      İsim
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="Ahmet" {...field} />
+                      <Input
+                        placeholder="Ahmet"
+                        className="h-10 border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -87,10 +85,16 @@ export function RegisterForm() {
                 control={form.control}
                 name="surname"
                 render={({ field }) => (
-                  <FormItem className="w-1/2">
-                    <FormLabel>Soyisim</FormLabel>
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Soyisim
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="Yılmaz" {...field} />
+                      <Input
+                        placeholder="Yılmaz"
+                        className="h-10 border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -102,9 +106,15 @@ export function RegisterForm() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kullanıcı Adı</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kullanıcı Adı
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="ahmetyilmaz" {...field} />
+                    <Input
+                      placeholder="ahmetyilmaz"
+                      className="h-10 border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -115,9 +125,15 @@ export function RegisterForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>E-posta</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    E-posta
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="ahmet@example.com" {...field} />
+                    <Input
+                      placeholder="ahmet@example.com"
+                      className="h-10 border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -128,16 +144,33 @@ export function RegisterForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Şifre</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Şifre
+                  </FormLabel>
                   <FormControl>
-                    <PasswordInput placeholder="••••••••" {...field} />
+                    <PasswordInput
+                      placeholder="••••••••"
+                      className="h-10 border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Kaydediliyor..." : "Kayıt Ol"}
+            <Button
+              type="submit"
+              className="w-full h-10 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-medium rounded-md transition-all duration-200 shadow-md"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Kaydediliyor...
+                </div>
+              ) : (
+                "Hesap Oluştur"
+              )}
             </Button>
           </form>
         </Form>

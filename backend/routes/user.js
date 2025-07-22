@@ -12,6 +12,7 @@ import {
 } from "../controllers/userController.js";
 import { protect } from "../middleware/protect.js";
 import { authorizeRoles } from "../middleware/authorizeRoles.js";
+import { changePassword } from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -64,5 +65,8 @@ router.patch(
   authorizeRoles("Admin"),
   demoteFromModerator
 );
+
+// Şifre değiştirme
+router.put("/change-password", protect, changePassword);
 
 export default router;

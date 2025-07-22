@@ -32,6 +32,7 @@ interface AuthState {
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
+  refreshAuth: (user: User, accessToken: string) => void; // Yeni fonksiyon
   logout: () => void;
 }
 
@@ -44,18 +45,21 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       // --- Eylemler (Actions) ---
-      // Kullanıcı bilgisini ve doğrulama durumunu ayarlar
       setUser: (user) => set({ user: user, isAuthenticated: !!user }),
-
-      // Sadece accessToken'ı ayarlar
       setToken: (token) => set({ accessToken: token }),
+      
+      // Yeni refresh fonksiyonu
+      refreshAuth: (user, accessToken) => set({ 
+        user, 
+        accessToken, 
+        isAuthenticated: true 
+      }),
 
-      // Tüm oturum bilgilerini temizler
       logout: () =>
         set({ user: null, accessToken: null, isAuthenticated: false }),
     }),
     {
-      name: "auth-storage", // localStorage'daki anahtarın adı
+      name: "auth-storage",
     }
   )
 );
