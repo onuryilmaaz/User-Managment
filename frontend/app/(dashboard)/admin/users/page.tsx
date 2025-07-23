@@ -6,6 +6,7 @@ import {
   getUserList,
   deleteUser,
   toggleUserStatus,
+  changeUserRole,
 } from "@/lib/services/user.service";
 import {
   Card,
@@ -33,12 +34,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   MoreHorizontal,
   Shield,
   ShieldCheck,
   Trash2,
   UserX,
   UserCheck,
+  User,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -55,10 +64,9 @@ interface UserData {
   lastLogin?: string;
 }
 
-// Extended User type for current user with _id field
 interface CurrentUser {
   id: string;
-  _id?: string; // Add _id for compatibility
+  _id?: string;
   name: string;
   surname?: string;
   username?: string;
@@ -120,7 +128,13 @@ export default function AdminUsersPage() {
   }, []);
 
   // Kullanıcı sil
-  const handleDeleteUser = async (userId: string) => {
+  const handleDeleteUser = async (userId: string, userRole: string) => {
+    // Moderatör admin silemez
+    if (currentUser?.role === "Moderator" && userRole === "Admin") {
+      toast.error("Moderatörler admin kullanıcıları silemez!");
+      return;
+    }
+
     if (!confirm("Bu kullanıcıyı silmek istediğinizden emin misiniz?")) return;
 
     try {
@@ -137,7 +151,13 @@ export default function AdminUsersPage() {
   };
 
   // Kullanıcı durumunu değiştir
-  const handleToggleStatus = async (userId: string) => {
+  const handleToggleStatus = async (userId: string, userRole: string) => {
+    // Moderatör admin'i pasif yapamaz
+    if (currentUser?.role === "Moderator" && userRole === "Admin") {
+      toast.error("Moderatörler admin kullanıcılarının durumunu değiştiremez!");
+      return;
+    }
+
     try {
       await toggleUserStatus(userId);
       toast.success("Kullanıcı durumu güncellendi");
@@ -151,10 +171,68 @@ export default function AdminUsersPage() {
     }
   };
 
-  // Helper function to get current user ID (handles both id and _id)
+  // Rol değiştir
+  const handleRoleChange = async (
+    userId: string,
+    newRole: "User" | "Moderator"
+  ) => {
+    // Sadece adminler rol değiştirebilir
+    if (currentUser?.role !== "Admin") {
+      toast.error("Sadece adminler rol değiştirebilir!");
+      return;
+    }
+
+    try {
+      await changeUserRole(userId, newRole);
+      toast.success("Kullanıcı rolü başarıyla güncellendi");
+      loadUsers();
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Rol değiştirilirken hata oluştu"
+      );
+    }
+  };
+
+  // Helper function to get current user ID
   const getCurrentUserId = () => {
     if (!currentUser) return null;
     return (currentUser as CurrentUser)._id || currentUser.id;
+  };
+
+  // Rol değiştirme yetkisi kontrolü
+  const canChangeRole = (targetUser: UserData) => {
+    // Sadece adminler rol değiştirebilir
+    if (currentUser?.role !== "Admin") return false;
+    // Admin kendisinin rolünü değiştiremez
+    if (targetUser._id === getCurrentUserId()) return false;
+    // Admin rolündeki kullanıcıların rolü değiştirilemez
+    if (targetUser.role === "Admin") return false;
+    return true;
+  };
+
+  // Silme yetkisi kontrolü
+  const canDelete = (targetUser: UserData) => {
+    // Kendi hesabını silemez
+    if (targetUser._id === getCurrentUserId()) return false;
+    // Moderatör admin silemez
+    if (currentUser?.role === "Moderator" && targetUser.role === "Admin")
+      return false;
+    // Admin olmayan kullanıcılar admin silemez
+    if (currentUser?.role !== "Admin" && targetUser.role === "Admin")
+      return false;
+    return true;
+  };
+
+  // Durum değiştirme yetkisi kontrolü
+  const canToggleStatus = (targetUser: UserData) => {
+    // Kendi durumunu değiştiremez
+    if (targetUser._id === getCurrentUserId()) return false;
+    // Moderatör admin'in durumunu değiştiremez
+    if (currentUser?.role === "Moderator" && targetUser.role === "Admin")
+      return false;
+    return true;
   };
 
   if (loading) {
@@ -215,23 +293,53 @@ export default function AdminUsersPage() {
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        user.role === "Admin"
-                          ? "destructive"
-                          : user.role === "Moderator"
-                          ? "default"
-                          : "secondary"
-                      }
-                    >
-                      {user.role === "Admin" && (
-                        <ShieldCheck className="w-3 h-3 mr-1" />
-                      )}
-                      {user.role === "Moderator" && (
-                        <Shield className="w-3 h-3 mr-1" />
-                      )}
-                      {user.role}
-                    </Badge>
+                    {canChangeRole(user) ? (
+                      <Select
+                        value={user.role}
+                        onValueChange={(value: "User" | "Moderator") =>
+                          handleRoleChange(user._id, value)
+                        }
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="User">
+                            <div className="flex items-center">
+                              <User className="w-3 h-3 mr-1" />
+                              User
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="Moderator">
+                            <div className="flex items-center">
+                              <Shield className="w-3 h-3 mr-1" />
+                              Moderator
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Badge
+                        variant={
+                          user.role === "Admin"
+                            ? "destructive"
+                            : user.role === "Moderator"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {user.role === "Admin" && (
+                          <ShieldCheck className="w-3 h-3 mr-1" />
+                        )}
+                        {user.role === "Moderator" && (
+                          <Shield className="w-3 h-3 mr-1" />
+                        )}
+                        {user.role === "User" && (
+                          <User className="w-3 h-3 mr-1" />
+                        )}
+                        {user.role}
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Badge variant={user.isActive ? "default" : "secondary"}>
@@ -247,43 +355,45 @@ export default function AdminUsersPage() {
                       : "Hiç giriş yapmamış"}
                   </TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
+                    {canToggleStatus(user) && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
 
-                        {/* Durum değiştir */}
-                        <DropdownMenuItem
-                          onClick={() => handleToggleStatus(user._id)}
-                          disabled={user._id === getCurrentUserId()}
-                        >
-                          {user.isActive ? (
-                            <>
-                              <UserX className="mr-2 h-4 w-4" />
-                              Pasif Yap
-                            </>
-                          ) : (
-                            <>
-                              <UserCheck className="mr-2 h-4 w-4" />
-                              Aktif Yap
-                            </>
-                          )}
-                        </DropdownMenuItem>
+                          {/* Durum değiştir */}
 
-                        {/* Kullanıcı sil */}
-                        {(currentUser?.role === "Admin" ||
-                          currentUser?.role === "Moderator") &&
-                          user.role !== "Admin" &&
-                          user._id !== getCurrentUserId() && (
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleToggleStatus(user._id, user.role)
+                            }
+                          >
+                            {user.isActive ? (
+                              <>
+                                <UserX className="mr-2 h-4 w-4" />
+                                Pasif Yap
+                              </>
+                            ) : (
+                              <>
+                                <UserCheck className="mr-2 h-4 w-4" />
+                                Aktif Yap
+                              </>
+                            )}
+                          </DropdownMenuItem>
+
+                          {/* Kullanıcı sil */}
+                          {canDelete(user) && (
                             <>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
-                                onClick={() => handleDeleteUser(user._id)}
+                                onClick={() =>
+                                  handleDeleteUser(user._id, user.role)
+                                }
                                 className="text-red-600"
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
@@ -291,8 +401,9 @@ export default function AdminUsersPage() {
                               </DropdownMenuItem>
                             </>
                           )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

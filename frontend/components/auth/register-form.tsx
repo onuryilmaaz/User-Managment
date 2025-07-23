@@ -57,7 +57,7 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="border-0 shadow-lg bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
+    <Card className="shadow-lg bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border border-blue-100 dark:border-blue-800">
       <CardContent className="p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -67,13 +67,13 @@ export function RegisterForm() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
                       İsim
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Ahmet"
-                        className="h-10 border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                        className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                         {...field}
                       />
                     </FormControl>
@@ -86,13 +86,13 @@ export function RegisterForm() {
                 name="surname"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
                       Soyisim
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Yılmaz"
-                        className="h-10 border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                        className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                         {...field}
                       />
                     </FormControl>
@@ -106,13 +106,13 @@ export function RegisterForm() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
                     Kullanıcı Adı
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="ahmetyilmaz"
-                      className="h-10 border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                      className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                       {...field}
                     />
                   </FormControl>
@@ -125,13 +125,13 @@ export function RegisterForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
                     E-posta
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="ahmet@example.com"
-                      className="h-10 border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                      className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                       {...field}
                     />
                   </FormControl>
@@ -144,13 +144,13 @@ export function RegisterForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
                     Şifre
                   </FormLabel>
                   <FormControl>
                     <PasswordInput
                       placeholder="••••••••"
-                      className="h-10 border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                      className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                       {...field}
                     />
                   </FormControl>
@@ -160,7 +160,7 @@ export function RegisterForm() {
             />
             <Button
               type="submit"
-              className="w-full h-10 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-medium rounded-md transition-all duration-200 shadow-md"
+              className="w-full h-10 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-medium rounded-md transition-all duration-200 shadow-md"
               disabled={isLoading}
             >
               {isLoading ? (

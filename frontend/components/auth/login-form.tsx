@@ -60,7 +60,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="border-0 shadow-lg bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
+    <Card className="shadow-lg bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border border-blue-100 dark:border-blue-800">
       <CardContent className="p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -69,13 +69,13 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
                     E-posta
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="ornek@email.com"
-                      className="h-10 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                      className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                       {...field}
                     />
                   </FormControl>
@@ -88,13 +88,13 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
                     Şifre
                   </FormLabel>
                   <FormControl>
                     <PasswordInput
                       placeholder="••••••••"
-                      className="h-10 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                      className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                       {...field}
                     />
                   </FormControl>
@@ -104,7 +104,7 @@ export function LoginForm() {
             />
             <Button
               type="submit"
-              className="w-full h-10 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-md transition-all duration-200 shadow-md"
+              className="w-full h-10 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-medium rounded-md transition-all duration-200 shadow-md"
               disabled={isLoading}
             >
               {isLoading ? (

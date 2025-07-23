@@ -1,8 +1,10 @@
 "use client";
 import { useAuthStore } from "@/lib/hooks/use-auth.store";
-import Link from "next/link"; // HATA BURADAYDI, DOĞRUSU BU
+import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, Shield, Zap, Users } from "lucide-react";
 
 export function Hero() {
   const { user } = useAuthStore();
@@ -10,7 +12,7 @@ export function Hero() {
   return (
     <>
       {user ? (
-        // --- GİRİŞ YAPMIŞ KULLANICI İÇİN GÖRÜNÜM ---
+        // Giriş yapmış kullanıcı için görünüm
         <main className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-2xl text-center">
             <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-10">
@@ -47,43 +49,68 @@ export function Hero() {
           </div>
         </main>
       ) : (
-        // --- GİRİŞ YAPMAMIŞ KULLANICI İÇİN GÖRÜNÜM ---
+        // Giriş yapmamış kullanıcı için SaaS landing sayfası
         <main className="flex-1">
-          <section className="container grid place-content-center gap-6 pb-8 pt-6 text-center md:py-10">
-            <div className="mx-auto flex max-w-[980px] flex-col items-center gap-2">
-              <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
-                Kullanıcı Yönetimini <br className="hidden sm:inline" />
-                Basitleştirin ve Güçlendirin
-              </h1>
-              <p className="max-w-[700px] text-lg text-muted-foreground">
-                Uygulamanız için ihtiyaç duyduğunuz tüm kimlik doğrulama ve
-                yetkilendirme özelliklerini tek bir yerde sunuyoruz.
-              </p>
+          {/* Hero Section */}
+          <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+            <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+            <div className="container relative z-10 px-4 py-24 mx-auto text-center lg:py-32">
+              <div className="mx-auto max-w-4xl">
+                <Badge variant="secondary" className="mb-6 px-4 py-2">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Yeni: Gelişmiş Güvenlik Özellikleri
+                </Badge>
+                
+                <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl lg:text-7xl">
+                  Kimlik Doğrulamayı
+                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Basitleştirin</span>
+                </h1>
+                
+                <p className="mt-6 text-xl leading-8 text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                  Güvenli, ölçeklenebilir ve kolay entegre edilebilir kimlik doğrulama sistemi. 
+                  Kullanıcı yönetimi, rol tabanlı erişim kontrolü ve daha fazlası.
+                </p>
+                
+                <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    href="/register"
+                    className={buttonVariants({ size: "lg", className: "px-8 py-4 text-lg" })}
+                  >
+                    Ücretsiz Başlayın
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                  <Link
+                    href="/login"
+                    className={buttonVariants({ 
+                      variant: "outline", 
+                      size: "lg", 
+                      className: "px-8 py-4 text-lg" 
+                    })}
+                  >
+                    Demo İzleyin
+                  </Link>
+                </div>
+                
+                <div className="mt-16 flex justify-center items-center space-x-8 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center">
+                    <Shield className="w-5 h-5 mr-2 text-green-500" />
+                    SOC 2 Uyumlu
+                  </div>
+                  <div className="flex items-center">
+                    <Users className="w-5 h-5 mr-2 text-blue-500" />
+                    10K+ Aktif Kullanıcı
+                  </div>
+                  <div className="flex items-center">
+                    <Zap className="w-5 h-5 mr-2 text-purple-500" />
+                    99.9% Uptime
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-center gap-4">
-              <Link href="/register" className={buttonVariants({ size: "lg" })}>
-                Ücretsiz Başla
-              </Link>
-              <Link
-                href="/login"
-                className={buttonVariants({ variant: "outline", size: "lg" })}
-              >
-                Giriş Yap
-              </Link>
-            </div>
-          </section>
-
-          <section
-            id="features"
-            className="container space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24"
-          >
-            <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
-              <h2 className="text-3xl font-bold leading-[1.1]">Özellikler</h2>
-              <p className="max-w-[85%] leading-normal text-muted-foreground">
-                Bu platform, modern web uygulamaları için tasarlanmış güçlü
-                özellikler sunar.
-              </p>
-            </div>
+            
+            {/* Gradient Orbs */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full blur-3xl opacity-20"></div>
+            <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl opacity-20"></div>
           </section>
         </main>
       )}
