@@ -2,9 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/lib/hooks/use-auth.store";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 interface GoogleAuthButtonProps {
   mode: "login" | "register";
@@ -12,59 +9,11 @@ interface GoogleAuthButtonProps {
 
 export function GoogleAuthButton({ mode }: GoogleAuthButtonProps) {
   const [loading, setLoading] = useState(false);
-  const { setUser, setToken } = useAuthStore();
-  const router = useRouter();
 
-  const handleGoogleAuth = async () => {
-    try {
-      setLoading(true);
-
-      const googleAuthUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
-
-      const popup = window.open(
-        googleAuthUrl,
-        "google-auth",
-        "width=500,height=600,scrollbars=yes,resizable=yes"
-      );
-
-      const handleMessage = (event: MessageEvent) => {
-        const backendOrigin = process.env.NEXT_PUBLIC_API_URL;
-        if (event.origin !== backendOrigin) {
-          console.log("Origin mismatch:", event.origin, "vs", backendOrigin);
-          return;
-        }
-
-        if (event.data.type === "GOOGLE_AUTH_SUCCESS") {
-          const { user, accessToken } = event.data;
-          setUser(user);
-          setToken(accessToken);
-          toast.success("Google ile giriş başarılı!");
-          router.push("/dashboard");
-          popup?.close();
-          window.removeEventListener("message", handleMessage);
-          setLoading(false);
-        } else if (event.data.type === "GOOGLE_AUTH_ERROR") {
-          toast.error(event.data.message || "Google ile giriş başarısız");
-          popup?.close();
-          window.removeEventListener("message", handleMessage);
-          setLoading(false);
-        }
-      };
-
-      window.addEventListener("message", handleMessage);
-
-      const checkClosed = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(checkClosed);
-          window.removeEventListener("message", handleMessage);
-          setLoading(false);
-        }
-      }, 1000);
-    } catch (error) {
-      toast.error("Google ile giriş sırasında hata oluştu");
-      console.error("Google auth error:", error);
-      setLoading(false);
-    }
+  const handleGoogleAuth = () => {
+    setLoading(true);
+    // Popup yerine doğrudan redirect kullan
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
   };
 
   return (
@@ -97,7 +46,7 @@ export function GoogleAuthButton({ mode }: GoogleAuthButtonProps) {
             />
             <path
               fill="#EA4335"
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              d="M12 1c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
           <span className="font-medium text-sm">

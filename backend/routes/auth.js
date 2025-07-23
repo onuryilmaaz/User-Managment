@@ -11,11 +11,15 @@ import {
   verifyCode,
   resendVerificationCode,
   googleAuthCallback,
+  getCSRFToken, // Yeni import
 } from "../controllers/authController.js";
 import { protect } from "../middleware/protect.js";
 import passport from "passport";
 
 const router = express.Router();
+
+// CSRF Token endpoint'i
+router.get("/csrf-token", getCSRFToken);
 
 // Kimlik doğrulama işlemleri
 router.post("/register", registerUser);

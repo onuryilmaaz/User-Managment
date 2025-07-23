@@ -13,9 +13,12 @@ export function Sidebar() {
     <div className="pb-12 w-64">
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+          <Link
+            href="/"
+            className="mb-2 px-4 text-lg font-semibold tracking-tight"
+          >
             Menü
-          </h2>
+          </Link>
           <div className="space-y-1">
             <Link
               href="/dashboard"

@@ -35,8 +35,8 @@ app.use(
   cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // İzin verilen metodlar
-    allowedHeaders: ["Content-Type", "Authorization"], // İzin verilen başlıklar
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"], // CSRF header ekle
   })
 );
 app.use(morgan("dev"));

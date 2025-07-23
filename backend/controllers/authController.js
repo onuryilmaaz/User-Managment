@@ -563,6 +563,27 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
+// 📌 CSRF TOKEN: /api/auth/csrf-token
+export const getCSRFToken = async (req, res) => {
+  try {
+    // Basit bir CSRF token oluştur
+    const csrfToken = crypto.randomBytes(32).toString('hex');
+    
+    // Token'ı session'a kaydet (gerçek uygulamada)
+    // Şimdilik sadece döndürüyoruz
+    res.json({
+      token: csrfToken,
+      message: 'CSRF token başarıyla oluşturuldu'
+    });
+  } catch (error) {
+    console.error('CSRF token error:', error);
+    res.status(500).json({
+      message: 'CSRF token oluşturulamadı',
+      error: error.message
+    });
+  }
+};
+
 // 📌 GOOGLE AUTH CALLBACK: /api/auth/google/callback
 export const googleAuthCallback = async (req, res) => {
   try {
@@ -572,7 +593,7 @@ export const googleAuthCallback = async (req, res) => {
 
     // Refresh token'ı database'e kaydet ve lastLogin'i güncelle
     user.refreshTokens.push({ token: refreshToken });
-    user.lastLogin = new Date(); // ✅ Son giriş zamanını güncelle
+    user.lastLogin = new Date();
     await user.save();
 
     // Activity log ekle
@@ -592,15 +613,15 @@ export const googleAuthCallback = async (req, res) => {
     delete userForFrontend.refreshTokens;
     delete userForFrontend.__v;
 
-    // Success sayfasına yönlendir (popup'a mesaj gönderecek)
+    // Frontend callback sayfasına yönlendir (popup yerine)
     const userParam = encodeURIComponent(JSON.stringify(userForFrontend));
-    res.redirect(`/success.html?user=${userParam}&token=${accessToken}`);
+    const callbackUrl = `${process.env.CLIENT_URL}/auth/google/callback?user=${userParam}&token=${accessToken}`;
+    res.redirect(callbackUrl);
   } catch (err) {
     console.error("Google auth error:", err);
-    // Error sayfasına yönlendir
-    res.redirect(
-      `/error.html?message=${encodeURIComponent("Google ile giriş başarısız")}`
-    );
+    // Error durumunda da frontend'e yönlendir
+    const errorMessage = encodeURIComponent("Google ile giriş başarısız");
+    res.redirect(`${process.env.CLIENT_URL}/auth/google/callback?error=${errorMessage}`);
   }
 };
 
