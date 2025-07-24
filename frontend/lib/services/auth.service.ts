@@ -2,10 +2,13 @@ import api from "../api";
 import {
   UserRegisterPayload,
   UserLoginPayload,
-  UpdateProfilePayload,
+  VerifyCodePayload,
+  ResendVerificationCodePayload,
+  ForgotPasswordPayload,
+  ResetPasswordWithCodePayload,
 } from "../validators/auth.schema";
 
-// Swagger'daki /api/auth/register endpoint'ine karşılık gelir
+// 1. KAYIT OL
 export const registerUser = async (payload: UserRegisterPayload) => {
   try {
     const { data } = await api.post("/api/auth/register", payload);
@@ -19,7 +22,7 @@ export const registerUser = async (payload: UserRegisterPayload) => {
   }
 };
 
-// Login
+// 2. GİRİŞ YAP
 export const loginUser = async (payload: UserLoginPayload) => {
   try {
     const { data } = await api.post("/api/auth/login", payload);
@@ -31,8 +34,8 @@ export const loginUser = async (payload: UserLoginPayload) => {
   }
 };
 
-// Email verification
-export const verifyCode = async (payload: { email: string; code: string }) => {
+// 3. DOĞRULAMA KODU DOĞRULA
+export const verifyCode = async (payload: VerifyCodePayload) => {
   try {
     const { data } = await api.post("/api/auth/verify-code", payload);
     return data;
@@ -43,13 +46,12 @@ export const verifyCode = async (payload: { email: string; code: string }) => {
   }
 };
 
-// Resend verification code
-export const resendVerificationCode = async (payload: { email: string }) => {
+// 4. DOĞRULAMA KODU YENİDEN GÖNDER
+export const resendVerificationCode = async (
+  payload: ResendVerificationCodePayload
+) => {
   try {
-    const { data } = await api.post(
-      "/api/auth/resend-verification-code",
-      payload
-    );
+    const { data } = await api.post("/api/auth/resend-code", payload);
     return data;
   } catch (error: unknown) {
     const errorMessage =
@@ -60,8 +62,8 @@ export const resendVerificationCode = async (payload: { email: string }) => {
   }
 };
 
-// Forgot password
-export const forgotPassword = async (payload: { email: string }) => {
+// 5. ŞİFREMİ UNUTTUM - KOD GÖNDER
+export const forgotPassword = async (payload: ForgotPasswordPayload) => {
   try {
     const { data } = await api.post("/api/auth/forgot-password", payload);
     return data;
@@ -74,16 +76,12 @@ export const forgotPassword = async (payload: { email: string }) => {
   }
 };
 
-// Reset password
-export const resetPassword = async (payload: {
-  token: string;
-  password: string;
-}) => {
+// 6. YENİ ŞİFRE BELİRLE (kod doğrulaması + şifre değiştirme)
+export const resetPasswordWithCode = async (
+  payload: ResetPasswordWithCodePayload
+) => {
   try {
-    const { data } = await api.post(
-      `/api/auth/reset-password/${payload.token}`,
-      { password: payload.password }
-    );
+    const { data } = await api.post("/api/auth/reset-password", payload);
     return data;
   } catch (error: unknown) {
     const errorMessage =
@@ -94,7 +92,7 @@ export const resetPassword = async (payload: {
   }
 };
 
-// Logout
+// 7. ÇIKIŞ YAP
 export const logoutUser = async () => {
   try {
     const { data } = await api.post("/api/auth/logout");
@@ -108,33 +106,29 @@ export const logoutUser = async () => {
   }
 };
 
-// Profile update
-export const updateUserProfile = async (payload: UpdateProfilePayload) => {
+// 8. TOKEN YENİLE
+export const refreshToken = async () => {
   try {
-    const { data } = await api.put("/api/user/update-profile", payload);
+    const { data } = await api.post("/api/auth/refresh");
     return data;
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error
         ? error.message
-        : "Profil güncellenirken bir hata oluştu.";
+        : "Token yenilenirken bir hata oluştu.";
     throw new Error(errorMessage);
   }
 };
 
-// Change password (for logged in users)
-export const changePassword = async (payload: {
-  currentPassword: string;
-  newPassword: string;
-}) => {
+// 9. GOOGLE AUTH CALLBACK (Frontend'te genellikle otomatik çağrılır)
+export const handleGoogleAuthCallback = (userParam: string, token: string) => {
   try {
-    const { data } = await api.put("/api/user/change-password", payload);
-    return data;
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "Şifre değiştirilirken bir hata oluştu.";
-    throw new Error(errorMessage);
+    const user = JSON.parse(decodeURIComponent(userParam));
+    // Token'ı localStorage veya cookie'ye kaydet
+    localStorage.setItem("accessToken", token);
+    return { user, token };
+  } catch (error) {
+    console.error(error);
+    throw new Error("Google auth callback işlenirken hata oluştu");
   }
 };

@@ -236,84 +236,107 @@
     "/api/auth/forgot-password": {
       "post": {
         "tags": ["Authentication"],
-        "summary": "Şifre sıfırlama linki içeren bir e-posta gönderir",
+        "summary": "Şifre sıfırlama için 6 haneli kod gönderir",
+        "description": "Kullanıcının e-posta adresine şifre sıfırlama için 6 haneli doğrulama kodu gönderir",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "properties": { "email": { "type": "string" } },
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  }
+                },
                 "required": ["email"]
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Şifre sıfırlama e-postası gönderildi" },
-          "404": { "description": "Kullanıcı bulunamadı" },
-          "500": { "description": "Hata oluştu" }
+          "200": {
+            "description": "Şifre sıfırlama kodu gönderildi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Şifre sıfırlama kodu e-posta adresinize gönderildi"
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "user@example.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı"
+          },
+          "500": { "description": "Sunucu hatası" }
         }
       }
     },
-    "/api/auth/reset-password/{token}": {
+    "/api/auth/reset-password": {
       "post": {
         "tags": ["Authentication"],
-        "summary": "Verilen token ile kullanıcının şifresini sıfırlar",
-        "parameters": [
-          {
-            "name": "token",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
+        "summary": "Kod ile yeni şifre belirler",
+        "description": "Doğrulanmış kod ile kullanıcının şifresini sıfırlar",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "properties": { "password": { "type": "string" } },
-                "required": ["password"]
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "code": {
+                    "type": "string",
+                    "example": "123456",
+                    "description": "6 haneli doğrulama kodu"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "yeniSifre123",
+                    "description": "En az 6 karakter olmalı"
+                  }
+                },
+                "required": ["email", "code", "newPassword"]
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Şifre başarıyla sıfırlandı" },
-          "400": { "description": "Token geçersiz veya süresi dolmuş" },
+          "200": {
+            "description": "Şifre başarıyla değiştirildi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Şifre başarıyla değiştirildi. Yeni şifrenizle giriş yapabilirsiniz"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Geçersiz kod veya şifre çok kısa" },
           "500": { "description": "Sunucu hatası" }
-        }
-      }
-    },
-    "/api/auth/send-verify-email": {
-      "post": {
-        "tags": ["Authentication"],
-        "summary": "Kullanıcıya e-posta doğrulama linki gönderir",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "200": { "description": "Doğrulama maili gönderildi" },
-          "500": { "description": "Hata oluştu" }
-        }
-      }
-    },
-    "/api/auth/verify-email/{token}": {
-      "get": {
-        "tags": ["Authentication"],
-        "summary": "E-posta adresini token ile doğrular",
-        "parameters": [
-          {
-            "name": "token",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": { "description": "E-posta başarıyla doğrulandı" },
-          "400": { "description": "Token geçersiz ya da süresi dolmuş" },
-          "404": { "description": "Kullanıcı bulunamadı" }
         }
       }
     },
@@ -367,6 +390,105 @@
           "200": { "description": "Profil başarıyla güncellendi" },
           "401": { "description": "Token geçersiz" },
           "403": { "description": "Hesap pasif durumda" },
+          "500": { "description": "Sunucu hatası" }
+        }
+      }
+    },
+    "/api/user/upload-image": {
+      "post": {
+        "tags": ["User Management"],
+        "summary": "Profil resmi yükler",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Yüklenecek resim dosyası"
+                  }
+                },
+                "required": ["image"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resim başarıyla yüklendi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "imageUrl": {
+                      "type": "string",
+                      "example": "http://localhost:3001/uploads/filename.jpg"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Dosya yüklenmedi" },
+          "401": { "description": "Token geçersiz" },
+          "500": { "description": "Sunucu hatası" }
+        }
+      }
+    },
+    "/api/user/change-password": {
+      "put": {
+        "tags": ["User Management"],
+        "summary": "Kullanıcının şifresini değiştirir",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "currentPassword": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "eskiSifre123"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "yeniSifre123",
+                    "description": "En az 6 karakter olmalı"
+                  }
+                },
+                "required": ["currentPassword", "newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Şifre başarıyla değiştirildi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Şifre başarıyla değiştirildi"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Mevcut şifre hatalı veya yeni şifre çok kısa" },
+          "401": { "description": "Token geçersiz" },
+          "404": { "description": "Kullanıcı bulunamadı" },
           "500": { "description": "Sunucu hatası" }
         }
       }
@@ -474,7 +596,7 @@
       "patch": {
         "tags": ["Admin Operations"],
         "summary": "Kullanıcı rolünü değiştirir (Sadece Admin)",
-        "description": "Admin kullanıcılarının rolü değiştirilemez. Kendi rolünüzü değiştiremezsiniz.",
+        "description": "Admin kullanıcılarının rolü değiştirilemez. Kendi rolünüzü değiştiremezsiniz. Bu endpoint hem promote hem de demote işlemlerini yapar.",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -495,7 +617,8 @@
                   "role": {
                     "type": "string",
                     "enum": ["User", "Moderator"],
-                    "description": "Yeni rol (User veya Moderator)"
+                    "description": "Yeni rol (User veya Moderator)",
+                    "example": "Moderator"
                   }
                 },
                 "required": ["role"]
@@ -511,7 +634,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": { "type": "string" },
+                    "message": { 
+                      "type": "string",
+                      "example": "Kullanıcı rolü Moderator olarak güncellendi"
+                    },
                     "user": {
                       "type": "object",
                       "properties": {
@@ -529,98 +655,6 @@
           "400": {
             "description": "Geçersiz rol veya kendi rolünüzü değiştiremezsiniz"
           },
-          "401": { "description": "Token geçersiz" },
-          "403": { "description": "Sadece admin yetkisi" },
-          "404": { "description": "Kullanıcı bulunamadı" },
-          "500": { "description": "Sunucu hatası" }
-        }
-      }
-    },
-    "/api/user/promote-to-moderator/{id}": {
-      "patch": {
-        "tags": ["Admin Operations"],
-        "summary": "Kullanıcıyı moderatör yapar (Sadece Admin)",
-        "description": "Normal kullanıcıları moderatör rolüne yükseltir.",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" },
-            "description": "Moderatör yapılacak kullanıcının ID'si"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Kullanıcı moderatör olarak atandı",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": { "type": "string" },
-                    "user": {
-                      "type": "object",
-                      "properties": {
-                        "id": { "type": "string" },
-                        "name": { "type": "string" },
-                        "email": { "type": "string" },
-                        "role": { "type": "string" }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": { "description": "Kullanıcı zaten moderatör veya admin" },
-          "401": { "description": "Token geçersiz" },
-          "403": { "description": "Sadece admin yetkisi" },
-          "404": { "description": "Kullanıcı bulunamadı" },
-          "500": { "description": "Sunucu hatası" }
-        }
-      }
-    },
-    "/api/user/demote-from-moderator/{id}": {
-      "patch": {
-        "tags": ["Admin Operations"],
-        "summary": "Moderatör yetkisini geri alır (Sadece Admin)",
-        "description": "Moderatör kullanıcıları normal kullanıcı rolüne düşürür.",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" },
-            "description": "Moderatör yetkisi alınacak kullanıcının ID'si"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Kullanıcının moderatör yetkisi geri alındı",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": { "type": "string" },
-                    "user": {
-                      "type": "object",
-                      "properties": {
-                        "id": { "type": "string" },
-                        "name": { "type": "string" },
-                        "email": { "type": "string" },
-                        "role": { "type": "string" }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": { "description": "Kullanıcı moderatör değil" },
           "401": { "description": "Token geçersiz" },
           "403": { "description": "Sadece admin yetkisi" },
           "404": { "description": "Kullanıcı bulunamadı" },

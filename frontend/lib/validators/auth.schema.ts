@@ -1,27 +1,72 @@
 import { z } from "zod";
 
-// --- Mevcut Kayıt Şeması ---
+// 1. KAYIT OL API için
 export const UserRegisterSchema = z.object({
   name: z.string().min(2, "İsim en az 2 karakter olmalıdır."),
-  surname: z.string().min(2, "Soyisim en az 2 karakter olmalıdır.").optional(),
-  username: z
-    .string()
-    .min(3, "Kullanıcı adı en az 3 karakter olmalıdır.")
-    .optional(),
+  surname: z.string().min(2, "Soyisim en az 2 karakter olmalıdır."),
+  username: z.string().min(3, "Kullanıcı adı en az 3 karakter olmalıdır."),
   email: z.string().email("Geçerli bir e-posta adresi giriniz."),
   password: z.string().min(6, "Şifre en az 6 karakter olmalıdır."),
 });
 
 export type UserRegisterPayload = z.infer<typeof UserRegisterSchema>;
 
-// --- YENİ EKLENEN GİRİŞ ŞEMASI ---
+// 2. GİRİŞ YAP API için
 export const UserLoginSchema = z.object({
   email: z.string().email("Geçerli bir e-posta adresi giriniz."),
-  password: z.string().min(1, "Şifre alanı boş bırakılamaz."), // Giriş formunda şifrenin sadece dolu olması yeterlidir
+  password: z.string().min(1, "Şifre alanı boş bırakılamaz."),
 });
 
 export type UserLoginPayload = z.infer<typeof UserLoginSchema>;
 
+// 3. DOĞRULAMA KODU DOĞRULA API için
+export const VerifyCodeSchema = z.object({
+  email: z.string().email("Geçerli bir e-posta adresi giriniz."),
+  code: z
+    .string()
+    .length(6, "Doğrulama kodu 6 haneli olmalıdır.")
+    .regex(/^\d+$/, "Sadece rakam giriniz."),
+});
+
+export type VerifyCodePayload = z.infer<typeof VerifyCodeSchema>;
+
+// 4. DOĞRULAMA KODU YENİDEN GÖNDER API için
+export const ResendVerificationCodeSchema = z.object({
+  email: z.string().email("Geçerli bir e-posta adresi giriniz."),
+});
+
+export type ResendVerificationCodePayload = z.infer<
+  typeof ResendVerificationCodeSchema
+>;
+
+// 5. ŞİFREMİ UNUTTUM - KOD GÖNDER API için
+export const ForgotPasswordSchema = z.object({
+  email: z.string().email("Geçerli bir e-posta adresi giriniz."),
+});
+
+export type ForgotPasswordPayload = z.infer<typeof ForgotPasswordSchema>;
+
+// 6. YENİ ŞİFRE BELİRLE API için (kod doğrulaması + şifre değiştirme)
+export const ResetPasswordWithCodeSchema = z
+  .object({
+    email: z.string().email("Geçerli bir e-posta adresi giriniz."),
+    code: z
+      .string()
+      .length(6, "Doğrulama kodu 6 haneli olmalıdır.")
+      .regex(/^\d+$/, "Sadece rakam giriniz."),
+    newPassword: z.string().min(6, "Şifre en az 6 karakter olmalıdır."),
+    confirmPassword: z.string().min(1, "Şifre onayı gereklidir."),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Şifreler eşleşmiyor.",
+    path: ["confirmPassword"],
+  });
+
+export type ResetPasswordWithCodePayload = z.infer<
+  typeof ResetPasswordWithCodeSchema
+>;
+
+// 7. KULLANICI PROFİL GÜNCELLEME (Frontend için)
 export const UpdateProfileSchema = z.object({
   profilePicture: z
     .string()
@@ -75,59 +120,71 @@ export type UpdateProfilePayload = z.infer<typeof UpdateProfileSchema>;
 
 // 2FA Validasyon Şemaları
 export const TwoFactorSetupSchema = z.object({
-  code: z.string().length(6, "Doğrulama kodu 6 haneli olmalıdır.").regex(/^\d+$/, "Sadece rakam giriniz."),
+  code: z
+    .string()
+    .length(6, "Doğrulama kodu 6 haneli olmalıdır.")
+    .regex(/^\d+$/, "Sadece rakam giriniz."),
 });
 
 export type TwoFactorSetupPayload = z.infer<typeof TwoFactorSetupSchema>;
 
 export const TwoFactorVerifySchema = z.object({
-  code: z.string().length(6, "Doğrulama kodu 6 haneli olmalıdır.").regex(/^\d+$/, "Sadece rakam giriniz."),
+  code: z
+    .string()
+    .length(6, "Doğrulama kodu 6 haneli olmalıdır.")
+    .regex(/^\d+$/, "Sadece rakam giriniz."),
 });
 
 export type TwoFactorVerifyPayload = z.infer<typeof TwoFactorVerifySchema>;
 
 // Şifre Değiştirme Şeması
-export const ChangePasswordSchema = z.object({
-  currentPassword: z.string().min(1, "Mevcut şifre gereklidir."),
-  newPassword: z.string()
-    .min(8, "Yeni şifre en az 8 karakter olmalıdır.")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
-      "Şifre en az 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermelidir."),
-  confirmPassword: z.string().min(1, "Şifre onayı gereklidir."),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Şifreler eşleşmiyor.",
-  path: ["confirmPassword"],
-});
+export const ChangePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Mevcut şifre gereklidir."),
+    newPassword: z
+      .string()
+      .min(8, "Yeni şifre en az 8 karakter olmalıdır.")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+        "Şifre en az 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermelidir."
+      ),
+    confirmPassword: z.string().min(1, "Şifre onayı gereklidir."),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Şifreler eşleşmiyor.",
+    path: ["confirmPassword"],
+  });
 
 export type ChangePasswordPayload = z.infer<typeof ChangePasswordSchema>;
 
 // Şifre Sıfırlama Şeması
-export const ResetPasswordSchema = z.object({
-  password: z.string()
-    .min(8, "Şifre en az 8 karakter olmalıdır.")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
-      "Şifre en az 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermelidir."),
-  confirmPassword: z.string().min(1, "Şifre onayı gereklidir."),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Şifreler eşleşmiyor.",
-  path: ["confirmPassword"],
-});
+export const ResetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Şifre en az 8 karakter olmalıdır.")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+        "Şifre en az 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermelidir."
+      ),
+    confirmPassword: z.string().min(1, "Şifre onayı gereklidir."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Şifreler eşleşmiyor.",
+    path: ["confirmPassword"],
+  });
 
 export type ResetPasswordPayload = z.infer<typeof ResetPasswordSchema>;
 
 // E-posta Doğrulama Şeması
 export const VerifyEmailSchema = z.object({
-  code: z.string().length(6, "Doğrulama kodu 6 haneli olmalıdır.").regex(/^\d+$/, "Sadece rakam giriniz."),
+  code: z
+    .string()
+    .length(6, "Doğrulama kodu 6 haneli olmalıdır.")
+    .regex(/^\d+$/, "Sadece rakam giriniz."),
 });
 
 export type VerifyEmailPayload = z.infer<typeof VerifyEmailSchema>;
-
-// Şifremi Unuttum Şeması
-export const ForgotPasswordSchema = z.object({
-  email: z.string().email("Geçerli bir e-posta adresi giriniz."),
-});
-
-export type ForgotPasswordPayload = z.infer<typeof ForgotPasswordSchema>;
 
 // Admin Kullanıcı Yönetimi Şemaları
 export const UpdateUserRoleSchema = z.object({
@@ -147,7 +204,9 @@ export const NotificationSettingsSchema = z.object({
   marketingEmails: z.boolean(),
 });
 
-export type NotificationSettingsPayload = z.infer<typeof NotificationSettingsSchema>;
+export type NotificationSettingsPayload = z.infer<
+  typeof NotificationSettingsSchema
+>;
 
 // Güvenlik Ayarları Şeması
 export const SecuritySettingsSchema = z.object({

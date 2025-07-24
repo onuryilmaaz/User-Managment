@@ -1,7 +1,29 @@
 import api from "../api";
-import { UpdateProfilePayload } from "../validators/auth.schema";
+import {
+  UpdateUserProfilePayload,
+  ChangeUserPasswordPayload,
+  GetUserListPayload,
+  UserResponse,
+  UserListResponse,
+} from "../validators/user.schema";
 
-export const updateUserProfile = async (payload: UpdateProfilePayload) => {
+// 1. KULLANICI PROFİL BİLGİLERİNİ AL (getMe)
+export const getUserProfile = async (): Promise<UserResponse> => {
+  try {
+    const { data } = await api.get("/api/user/me");
+    return data;
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } } };
+    throw new Error(
+      err.response?.data?.message || "Profil bilgileri alınırken hata oluştu."
+    );
+  }
+};
+
+// 2. KULLANICI PROFİL GÜNCELLEME (updateProfile)
+export const updateUserProfile = async (
+  payload: UpdateUserProfilePayload
+): Promise<UserResponse> => {
   try {
     const { data } = await api.put("/api/user/update-profile", payload);
     return data;
@@ -13,27 +35,27 @@ export const updateUserProfile = async (payload: UpdateProfilePayload) => {
   }
 };
 
-export const uploadImage = async (file: File) => {
-  const formData = new FormData();
-  formData.append("image", file);
-
+// 3. ŞİFRE DEĞİŞTİRME (changePassword)
+export const changeUserPassword = async (
+  payload: ChangeUserPasswordPayload
+): Promise<{ message: string }> => {
   try {
-    const { data } = await api.post("/api/user/upload-image", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const { data } = await api.patch("/api/user/change-password", payload);
     return data;
   } catch (error: unknown) {
     const err = error as { response?: { data?: { message?: string } } };
-    throw new Error(err.response?.data?.message || "Resim yüklenemedi.");
+    throw new Error(
+      err.response?.data?.message || "Şifre değiştirilirken hata oluştu."
+    );
   }
 };
 
-// Admin/Moderatör için kullanıcı yönetimi API'leri
-export const getUserList = async () => {
+// 4. KULLANICI LİSTESİ ALMA (getUserList) - Admin/Moderator
+export const getUserList = async (
+  params?: GetUserListPayload
+): Promise<UserListResponse> => {
   try {
-    const { data } = await api.get("/api/user/list");
+    const { data } = await api.get("/api/user/list", { params });
     return data;
   } catch (error: unknown) {
     const err = error as { response?: { data?: { message?: string } } };
@@ -43,7 +65,10 @@ export const getUserList = async () => {
   }
 };
 
-export const deleteUser = async (userId: string) => {
+// 5. KULLANICI SİLME (deleteUser) - Admin
+export const deleteUser = async (
+  userId: string
+): Promise<{ message: string }> => {
   try {
     const { data } = await api.delete(`/api/user/delete/${userId}`);
     return data;
@@ -55,7 +80,10 @@ export const deleteUser = async (userId: string) => {
   }
 };
 
-export const toggleUserStatus = async (userId: string) => {
+// 6. KULLANICI DURUMU DEĞİŞTİRME (toggleUserStatus) - Admin/Moderator
+export const toggleUserStatus = async (
+  userId: string
+): Promise<{ message: string; user: UserResponse }> => {
   try {
     const { data } = await api.patch(`/api/user/toggle-status/${userId}`);
     return data;
@@ -68,10 +96,11 @@ export const toggleUserStatus = async (userId: string) => {
   }
 };
 
+// 7. KULLANICI ROL DEİŞTİRME (changeUserRole) - Admin
 export const changeUserRole = async (
   userId: string,
   role: "User" | "Moderator"
-) => {
+): Promise<{ message: string; user: UserResponse }> => {
   try {
     const { data } = await api.patch(`/api/user/change-role/${userId}`, {
       role,
@@ -86,43 +115,22 @@ export const changeUserRole = async (
   }
 };
 
-export const promoteToModerator = async (userId: string) => {
-  try {
-    const { data } = await api.patch(
-      `/api/user/promote-to-moderator/${userId}`
-    );
-    return data;
-  } catch (error: unknown) {
-    const err = error as { response?: { data?: { message?: string } } };
-    throw new Error(
-      err.response?.data?.message || "Moderatör yapılırken hata oluştu."
-    );
-  }
-};
+// 8. PROFİL RESMİ YÜKLEME (uploadImage)
+export const uploadUserImage = async (
+  file: File
+): Promise<{ message: string; imageUrl: string }> => {
+  const formData = new FormData();
+  formData.append("image", file);
 
-export const demoteFromModerator = async (userId: string) => {
   try {
-    const { data } = await api.patch(
-      `/api/user/demote-from-moderator/${userId}`
-    );
+    const { data } = await api.post("/api/user/upload-image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return data;
   } catch (error: unknown) {
     const err = error as { response?: { data?: { message?: string } } };
-    throw new Error(
-      err.response?.data?.message || "Moderatörlükten çıkarılırken hata oluştu."
-    );
-  }
-};
-
-// Kullanıcı profil bilgilerini al
-export const getUserProfile = async () => {
-  try {
-    const { data } = await api.get("/api/user/me");
-    return data;
-  } catch (error: unknown) {
-    const err = error as { response?: { data?: { message?: string } } };
-    throw new Error(
-      err.response?.data?.message || "Profil bilgileri alınırken hata oluştu."
-    );
+    throw new Error(err.response?.data?.message || "Resim yüklenemedi.");
   }
 };

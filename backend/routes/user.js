@@ -7,12 +7,10 @@ import {
   deleteUser,
   toggleUserStatus,
   changeUserRole,
-  promoteToModerator,
-  demoteFromModerator,
+  changePassword,
 } from "../controllers/userController.js";
 import { protect } from "../middleware/protect.js";
 import { authorizeRoles } from "../middleware/authorizeRoles.js";
-import { changePassword } from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -52,18 +50,6 @@ router.patch(
   protect,
   authorizeRoles("Admin"),
   changeUserRole
-);
-router.patch(
-  "/promote-to-moderator/:id",
-  protect,
-  authorizeRoles("Admin"),
-  promoteToModerator
-);
-router.patch(
-  "/demote-from-moderator/:id",
-  protect,
-  authorizeRoles("Admin"),
-  demoteFromModerator
 );
 
 // Şifre değiştirme

@@ -76,32 +76,37 @@ const userSchema = new mongoose.Schema(
     lastLogin: {
       type: Date,
     },
-    // ✅ 6 haneli doğrulama kodu için yeni alanlar
     verificationCode: {
       type: String,
     },
     verificationCodeExpire: {
       type: Date,
     },
-    // ✅ Şifre sıfırlama için gerekli alanlar
+    resetCode: {
+      type: String,
+    },
+    resetCodeExpire: {
+      type: Date,
+    },
     resetPasswordToken: {
       type: String,
     },
     resetPasswordExpire: {
       type: Date,
     },
-    // ✅ Refresh token için yeni alanlar
-    refreshTokens: [{
-      token: {
-        type: String,
-        required: true
+    refreshTokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+          expires: 2592000,
+        },
       },
-      createdAt: {
-        type: Date,
-        default: Date.now,
-        expires: 2592000
-      }
-    }],
+    ],
   },
   {
     timestamps: true,
