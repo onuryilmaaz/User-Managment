@@ -6,6 +6,7 @@ import {
   ResendVerificationCodePayload,
   ForgotPasswordPayload,
   ResetPasswordWithCodePayload,
+  ChangePasswordPayload,
 } from "../validators/auth.schema";
 
 // 1. KAYIT OL
@@ -38,7 +39,7 @@ export const loginUser = async (payload: UserLoginPayload) => {
 export const verifyCode = async (payload: VerifyCodePayload) => {
   try {
     const { data } = await api.post("/api/auth/verify-code", payload);
-    return data;
+    return data; // Backend'den gelen tam response'u döndür (user, tokens, message)
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Doğrulama kodu hatalı.";
@@ -130,5 +131,23 @@ export const handleGoogleAuthCallback = (userParam: string, token: string) => {
   } catch (error) {
     console.error(error);
     throw new Error("Google auth callback işlenirken hata oluştu");
+  }
+};
+
+
+// resetPassword fonksiyonunu kaldır (token tabanlı)
+// Sadece resetPasswordWithCode fonksiyonunu tut
+
+// changePassword fonksiyonunu düzelt
+export const changePassword = async (payload: ChangePasswordPayload) => {
+  try {
+    const { data } = await api.patch("/api/user/change-password", payload);
+    return data;
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Şifre değiştirilirken bir hata oluştu.";
+    throw new Error(errorMessage);
   }
 };

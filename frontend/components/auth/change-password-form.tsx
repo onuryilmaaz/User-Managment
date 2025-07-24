@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useState } from "react";
 import { z } from "zod";
+import { ChangePasswordSchema } from "@/lib/validators/auth.schema";
 import { changePassword } from "@/lib/services/auth.service";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,28 +18,13 @@ import {
 } from "@/components/ui/form";
 import { PasswordInput } from "@/components/ui/password-input";
 
-const changePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(1, "Mevcut şifre gerekli"),
-    newPassword: z.string().min(6, "Yeni şifre en az 6 karakter olmalıdır"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Şifreler eşleşmiyor",
-    path: ["confirmPassword"],
-  })
-  .refine((data) => data.currentPassword !== data.newPassword, {
-    message: "Yeni şifre mevcut şifreden farklı olmalıdır",
-    path: ["newPassword"],
-  });
-
-type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+type ChangePasswordFormData = z.infer<typeof ChangePasswordSchema>;
 
 export function ChangePasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<ChangePasswordFormData>({
-    resolver: zodResolver(changePasswordSchema),
+    resolver: zodResolver(ChangePasswordSchema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
@@ -52,6 +38,7 @@ export function ChangePasswordForm() {
       await changePassword({
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
+        confirmPassword: data.confirmPassword,
       });
       toast.success("Şifreniz başarıyla değiştirildi.");
       form.reset();

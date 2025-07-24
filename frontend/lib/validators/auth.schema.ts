@@ -1,12 +1,21 @@
 import { z } from "zod";
 
+// Ortak şifre validasyonu
+const passwordValidation = z
+  .string()
+  .min(8, "Şifre en az 8 karakter olmalıdır.")
+  .regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]/,
+    "Şifre en az 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermelidir."
+  );
+
 // 1. KAYIT OL API için
 export const UserRegisterSchema = z.object({
   name: z.string().min(2, "İsim en az 2 karakter olmalıdır."),
   surname: z.string().min(2, "Soyisim en az 2 karakter olmalıdır."),
   username: z.string().min(3, "Kullanıcı adı en az 3 karakter olmalıdır."),
   email: z.string().email("Geçerli bir e-posta adresi giriniz."),
-  password: z.string().min(6, "Şifre en az 6 karakter olmalıdır."),
+  password: passwordValidation,
 });
 
 export type UserRegisterPayload = z.infer<typeof UserRegisterSchema>;
@@ -54,7 +63,7 @@ export const ResetPasswordWithCodeSchema = z
       .string()
       .length(6, "Doğrulama kodu 6 haneli olmalıdır.")
       .regex(/^\d+$/, "Sadece rakam giriniz."),
-    newPassword: z.string().min(6, "Şifre en az 6 karakter olmalıdır."),
+    newPassword: passwordValidation,
     confirmPassword: z.string().min(1, "Şifre onayı gereklidir."),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -141,13 +150,7 @@ export type TwoFactorVerifyPayload = z.infer<typeof TwoFactorVerifySchema>;
 export const ChangePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "Mevcut şifre gereklidir."),
-    newPassword: z
-      .string()
-      .min(8, "Yeni şifre en az 8 karakter olmalıdır.")
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-        "Şifre en az 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermelidir."
-      ),
+    newPassword: passwordValidation,
     confirmPassword: z.string().min(1, "Şifre onayı gereklidir."),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -160,13 +163,7 @@ export type ChangePasswordPayload = z.infer<typeof ChangePasswordSchema>;
 // Şifre Sıfırlama Şeması
 export const ResetPasswordSchema = z
   .object({
-    password: z
-      .string()
-      .min(8, "Şifre en az 8 karakter olmalıdır.")
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-        "Şifre en az 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermelidir."
-      ),
+    password: passwordValidation,
     confirmPassword: z.string().min(1, "Şifre onayı gereklidir."),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -198,10 +195,12 @@ export type UpdateUserRolePayload = z.infer<typeof UpdateUserRoleSchema>;
 
 // Bildirim Ayarları Şeması
 export const NotificationSettingsSchema = z.object({
-  emailNotifications: z.boolean(),
-  pushNotifications: z.boolean(),
-  securityAlerts: z.boolean(),
-  marketingEmails: z.boolean(),
+  emailNotifications: z.boolean().default(true),
+  pushNotifications: z.boolean().default(true),
+  smsNotifications: z.boolean().default(false),
+  marketingEmails: z.boolean().default(false),
+  securityAlerts: z.boolean().default(true),
+  weeklyDigest: z.boolean().default(true),
 });
 
 export type NotificationSettingsPayload = z.infer<

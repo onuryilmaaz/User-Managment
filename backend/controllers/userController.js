@@ -185,6 +185,21 @@ export const changeUserRole = async (req, res) => {
 };
 
 // 📌 ŞİFRE DEĞİŞTİR: /api/user/change-password
+// Şifre validasyon fonksiyonu - dosyanın başına ekle
+const validatePassword = (password) => {
+  if (password.length < 8) {
+    return "Şifre en az 8 karakter olmalı";
+  }
+  
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return "Şifre en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir";
+  }
+  
+  return null;
+};
+
+// changePassword fonksiyonunu güncelle
 export const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -194,6 +209,12 @@ export const changePassword = async (req, res) => {
       return res.status(400).json({
         message: "Mevcut şifre ve yeni şifre gerekli",
       });
+    }
+
+    // Şifre validasyonu
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      return res.status(400).json({ message: passwordError });
     }
 
     if (newPassword.length < 6) {

@@ -41,6 +41,21 @@ const generateVerificationCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+// Şifre validasyon fonksiyonu - dosyanın başına ekle
+const validatePassword = (password) => {
+  if (password.length < 8) {
+    return "Şifre en az 8 karakter olmalı";
+  }
+
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return "Şifre en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir";
+  }
+
+  return null;
+};
+
 // KAYIT OL
 export const registerUser = async (req, res) => {
   try {
@@ -284,10 +299,10 @@ export const resetPasswordWithCode = async (req, res) => {
       });
     }
 
-    if (newPassword.length < 6) {
-      return res.status(400).json({
-        message: "Şifre en az 6 karakter olmalı",
-      });
+    // Şifre validasyonu - düzeltildi
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      return res.status(400).json({ message: passwordError });
     }
 
     // Kod doğrulaması burada yapılıyor zaten
