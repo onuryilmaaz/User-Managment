@@ -3,8 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import sendEmail from "../utils/sendEmail.js";
-// Activity logging import'u ekle
-import { logActivity } from "./activityController.js";
 
 // 🔐 Access Token üretici (kısa süreli)
 const generateAccessToken = (user) => {
@@ -143,13 +141,7 @@ export const verifyCode = async (req, res) => {
     user.refreshTokens.push({ token: refreshToken });
     await user.save();
 
-    // Activity log ekle
-    await logActivity(
-      user._id,
-      "email_verification",
-      `Kullanıcı ${user.email} e-posta doğrulamasını tamamladı`,
-      req
-    );
+    // Activity log kaldırıldı
 
     // Token'ları cookie'ye yaz
     sendTokenCookies(res, accessToken, refreshToken);
@@ -250,13 +242,7 @@ export const loginUser = async (req, res) => {
     user.lastLogin = new Date(); // ✅ Son giriş zamanını güncelle
     await user.save();
 
-    // Activity log ekle
-    await logActivity(
-      user._id,
-      "login",
-      `Kullanıcı ${user.email} başarıyla giriş yaptı`,
-      req
-    );
+    // Activity log kaldırıldı
 
     // Token'ları cookie'ye yaz
     sendTokenCookies(res, accessToken, refreshToken);
@@ -337,13 +323,7 @@ export const logoutUser = async (req, res) => {
         });
         if (user) {
           userId = user._id;
-          // Activity log ekle
-          await logActivity(
-            userId,
-            "logout",
-            `Kullanıcı ${user.email} çıkış yaptı`,
-            req
-          );
+          // Activity log kaldırıldı
         }
       } catch (error) {
         console.error("Logout activity log error:", error);
@@ -506,13 +486,7 @@ export const resetPassword = async (req, res) => {
     user.resetPasswordExpire = undefined;
     await user.save();
 
-    // Activity log ekle
-    await logActivity(
-      user._id,
-      "password_reset",
-      `Kullanıcı ${user.email} şifresini sıfırladı`,
-      req
-    );
+    // Activity log kaldırıldı
 
     res.status(200).json({
       message:
@@ -567,19 +541,19 @@ export const verifyEmail = async (req, res) => {
 export const getCSRFToken = async (req, res) => {
   try {
     // Basit bir CSRF token oluştur
-    const csrfToken = crypto.randomBytes(32).toString('hex');
-    
+    const csrfToken = crypto.randomBytes(32).toString("hex");
+
     // Token'ı session'a kaydet (gerçek uygulamada)
     // Şimdilik sadece döndürüyoruz
     res.json({
       token: csrfToken,
-      message: 'CSRF token başarıyla oluşturuldu'
+      message: "CSRF token başarıyla oluşturuldu",
     });
   } catch (error) {
-    console.error('CSRF token error:', error);
+    console.error("CSRF token error:", error);
     res.status(500).json({
-      message: 'CSRF token oluşturulamadı',
-      error: error.message
+      message: "CSRF token oluşturulamadı",
+      error: error.message,
     });
   }
 };
@@ -596,13 +570,7 @@ export const googleAuthCallback = async (req, res) => {
     user.lastLogin = new Date();
     await user.save();
 
-    // Activity log ekle
-    await logActivity(
-      user._id,
-      "login",
-      `Kullanıcı ${user.email} Google ile giriş yaptı`,
-      req
-    );
+    // Activity log kaldırıldı
 
     // Token'ları cookie'ye yaz
     sendTokenCookies(res, accessToken, refreshToken);
@@ -621,7 +589,9 @@ export const googleAuthCallback = async (req, res) => {
     console.error("Google auth error:", err);
     // Error durumunda da frontend'e yönlendir
     const errorMessage = encodeURIComponent("Google ile giriş başarısız");
-    res.redirect(`${process.env.CLIENT_URL}/auth/google/callback?error=${errorMessage}`);
+    res.redirect(
+      `${process.env.CLIENT_URL}/auth/google/callback?error=${errorMessage}`
+    );
   }
 };
 
