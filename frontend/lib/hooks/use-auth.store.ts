@@ -10,6 +10,7 @@ interface AuthState {
   setUser: (user: UserResponse | null) => void;
   setToken: (token: string | null) => void;
   refreshAuth: (user: UserResponse, accessToken: string) => void;
+  updateToken: (accessToken: string) => void; // Yeni eklenen fonksiyon
   logout: () => void;
 }
 
@@ -31,6 +32,9 @@ export const useAuthStore = create<AuthState>()(
         accessToken, 
         isAuthenticated: true 
       }),
+
+      // Sadece token'ı güncelle
+      updateToken: (accessToken) => set({ accessToken }),
 
       logout: () =>
         set({ user: null, accessToken: null, isAuthenticated: false }),
