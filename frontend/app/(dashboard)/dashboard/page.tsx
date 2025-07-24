@@ -231,35 +231,39 @@ export default function DashboardPage() {
               Hesap İşlemleri
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Link href="/profile">
-              <Button
-                variant="outline"
-                className="w-full justify-start h-12 hover:bg-blue-50 dark:hover:bg-blue-950/20"
-              >
-                <User className="mr-3 h-4 w-4" />
-                <div className="text-left">
-                  <div className="font-medium">Profili Düzenle</div>
-                  <div className="text-xs text-gray-500">
-                    Kişisel bilgilerinizi güncelleyin
+          <CardContent className="space-y-5">
+            <div className="space-y-3">
+              <Link href="/profile">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start h-12 hover:bg-blue-50 dark:hover:bg-blue-950/20"
+                >
+                  <User className="mr-3 h-4 w-4" />
+                  <div className="text-left">
+                    <div className="font-medium">Profili Düzenle</div>
+                    <div className="text-xs text-gray-500">
+                      Kişisel bilgilerinizi güncelleyin
+                    </div>
                   </div>
-                </div>
-              </Button>
-            </Link>
-            <Link href="/settings">
-              <Button
-                variant="outline"
-                className="w-full justify-start h-12 hover:bg-blue-50 dark:hover:bg-blue-950/20"
-              >
-                <Settings className="mr-3 h-4 w-4" />
-                <div className="text-left">
-                  <div className="font-medium">Ayarlar</div>
-                  <div className="text-xs text-gray-500">
-                    Güvenlik ve tercihler
+                </Button>
+              </Link>
+            </div>
+            <div className="space-y-3">
+              <Link href="/settings">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start h-12 hover:bg-blue-50 dark:hover:bg-blue-950/20"
+                >
+                  <Settings className="mr-3 h-4 w-4" />
+                  <div className="text-left">
+                    <div className="font-medium">Ayarlar</div>
+                    <div className="text-xs text-gray-500">
+                      Güvenlik ve tercihler
+                    </div>
                   </div>
-                </div>
-              </Button>
-            </Link>
+                </Button>
+              </Link>
+            </div>
           </CardContent>
         </Card>
 
@@ -273,36 +277,40 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Link href="/admin/users">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start h-12 hover:bg-purple-50 dark:hover:bg-purple-950/20"
-                >
-                  <Users className="mr-3 h-4 w-4" />
-                  <div className="text-left">
-                    <div className="font-medium">Kullanıcı Yönetimi</div>
-                    <div className="text-xs text-gray-500">
-                      Kullanıcıları görüntüle ve yönet
-                    </div>
-                  </div>
-                </Button>
-              </Link>
-              {user.role === "Admin" && (
-                <Link href="/admin/settings">
+              <div className="space-y-3">
+                <Link href="/admin/users">
                   <Button
                     variant="outline"
                     className="w-full justify-start h-12 hover:bg-purple-50 dark:hover:bg-purple-950/20"
                   >
-                    <ShieldCheck className="mr-3 h-4 w-4" />
+                    <Users className="mr-3 h-4 w-4" />
                     <div className="text-left">
-                      <div className="font-medium">Sistem Ayarları</div>
+                      <div className="font-medium">Kullanıcı Yönetimi</div>
                       <div className="text-xs text-gray-500">
-                        Genel sistem konfigürasyonu
+                        Kullanıcıları görüntüle ve yönet
                       </div>
                     </div>
                   </Button>
                 </Link>
-              )}
+              </div>
+              <div className="space-y-3">
+                {user.role === "Admin" && (
+                  <Link href="/admin/settings">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start h-12 hover:bg-purple-50 dark:hover:bg-purple-950/20"
+                    >
+                      <ShieldCheck className="mr-3 h-4 w-4" />
+                      <div className="text-left">
+                        <div className="font-medium">Sistem Ayarları</div>
+                        <div className="text-xs text-gray-500">
+                          Genel sistem konfigürasyonu
+                        </div>
+                      </div>
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </CardContent>
           </Card>
         )}
