@@ -57,7 +57,7 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="shadow-lg bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border border-blue-100 dark:border-blue-800">
+    <Card className="shadow-lg bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border border-green-100 dark:border-green-800">
       <CardContent className="p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -160,7 +160,7 @@ export function RegisterForm() {
             />
             <Button
               type="submit"
-              className="w-full h-10 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-medium rounded-md transition-all duration-200 shadow-md"
+              className="w-full h-10 bg-gradient-to-r from-green-600 to-emerald-800 hover:from-green-700 hover:to-emerald-900 text-white font-medium rounded-md transition-all duration-200 shadow-md"
               disabled={isLoading}
             >
               {isLoading ? (

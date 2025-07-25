@@ -52,7 +52,7 @@ export function Hero() {
         // Giriş yapmamış kullanıcı için SaaS landing sayfası
         <main className="flex-1">
           {/* Hero Section */}
-          <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+          <section className="relative overflow-hidden bg-gradient-to-br from-green-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
             <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
             <div className="container relative z-10 px-4 py-24 mx-auto text-center lg:py-32">
               <div className="mx-auto max-w-4xl">
@@ -63,7 +63,7 @@ export function Hero() {
                 
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl lg:text-7xl">
                   Kimlik Doğrulamayı
-                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Basitleştirin</span>
+                  <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> Basitleştirin</span>
                 </h1>
                 
                 <p className="mt-6 text-xl leading-8 text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
@@ -101,7 +101,7 @@ export function Hero() {
                     10K+ Aktif Kullanıcı
                   </div>
                   <div className="flex items-center">
-                    <Zap className="w-5 h-5 mr-2 text-purple-500" />
+                    <Zap className="w-5 h-5 mr-2 text-emerald-500" />
                     99.9% Uptime
                   </div>
                 </div>
@@ -109,8 +109,8 @@ export function Hero() {
             </div>
             
             {/* Gradient Orbs */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full blur-3xl opacity-20"></div>
-            <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl opacity-20"></div>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full blur-3xl opacity-20"></div>
+            <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full blur-3xl opacity-20"></div>
           </section>
         </main>
       )}

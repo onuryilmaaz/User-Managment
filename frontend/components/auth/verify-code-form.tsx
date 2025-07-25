@@ -203,7 +203,7 @@ export function VerifyCodeForm() {
                         onChange={(e) => handleDigitChange(index, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(index, e)}
                         onPaste={handlePaste}
-                        className="w-12 h-12 text-center text-lg font-semibold border-2 focus:border-blue-500 transition-colors"
+                        className="w-12 h-12 text-center text-lg font-semibold border-2 focus:border-green-500 transition-colors"
                         disabled={isLoading || isExpired}
                       />
                     ))}

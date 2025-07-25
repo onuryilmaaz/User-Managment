@@ -72,13 +72,13 @@ const features = [
 
 const badgeColors = {
   "Güvenlik": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  "Yönetim": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  "Geliştirici": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  "Platform": "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+  "Yönetim": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  "Geliştirici": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
+  "Platform": "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
   "Analitik": "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
   "Mobil": "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
   "API": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  "Sosyal": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200"
+  "Sosyal": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200"
 };
 
 export function Features() {
@@ -91,7 +91,7 @@ export function Features() {
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl mb-4">
             Her İhtiyacınız İçin
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Güçlü Özellikler</span>
+            <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> Güçlü Özellikler</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Modern uygulamalar için tasarlanmış kapsamlı kimlik doğrulama ve yetkilendirme çözümü.
@@ -105,7 +105,7 @@ export function Features() {
               <Card key={index} className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
                 <CardHeader>
                   <div className="flex items-center justify-between mb-2">
-                    <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
+                    <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg">
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <Badge 
@@ -122,7 +122,7 @@ export function Features() {
                     {feature.description}
                   </CardDescription>
                 </CardContent>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Card>
             );
           })}

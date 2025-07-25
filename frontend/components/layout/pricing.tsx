@@ -65,7 +65,7 @@ export function Pricing() {
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl mb-4">
             Her Bütçeye Uygun
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Çözümler</span>
+            <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> Çözümler</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             İhtiyaçlarınıza göre ölçeklenen esnek fiyatlandırma seçenekleri.
@@ -76,11 +76,11 @@ export function Pricing() {
           {plans.map((plan, index) => (
             <Card 
               key={index} 
-              className={`relative ${plan.popular ? 'border-blue-500 shadow-lg scale-105' : ''}`}
+              className={`relative ${plan.popular ? 'border-green-500 shadow-lg scale-105' : ''}`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1">
+                  <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-1">
                     <Star className="w-4 h-4 mr-1" />
                     En Popüler
                   </Badge>
@@ -110,7 +110,7 @@ export function Pricing() {
                 
                 <Link href={plan.name === 'Kurumsal' ? '/contact' : '/register'}>
                   <Button 
-                    className={`w-full ${plan.popular ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700' : ''}`}
+                    className={`w-full ${plan.popular ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700' : ''}`}
                     variant={plan.popular ? 'default' : 'outline'}
                   >
                     {plan.cta}
