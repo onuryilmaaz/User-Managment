@@ -132,7 +132,14 @@ export const loginUser = async (req, res) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken();
 
+    // Eski refresh token'ları temizle (son 5 tanesini tut)
+    if (user.refreshTokens.length >= 5) {
+      user.refreshTokens = user.refreshTokens.slice(-4); // Son 4 tanesini tut
+    }
+
     user.refreshTokens.push({ token: refreshToken });
+    await user.save();
+
     user.lastLogin = new Date();
     await user.save();
 
@@ -185,6 +192,11 @@ export const verifyCode = async (req, res) => {
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken();
+
+    // Son 5 token'ı tut
+    if (user.refreshTokens.length >= 5) {
+      user.refreshTokens = user.refreshTokens.slice(-4);
+    }
 
     user.refreshTokens.push({ token: refreshToken });
     await user.save();
@@ -358,7 +370,7 @@ export const logoutUser = async (req, res) => {
   }
 };
 
-// TOKEN YENİLE
+// TOKEN YENİLE - Token Rotation ile güncellenmiş
 export const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;
@@ -377,24 +389,91 @@ export const refreshToken = async (req, res) => {
       return res.status(401).json({ message: "Geçersiz refresh token" });
     }
 
-    const newAccessToken = generateAccessToken(user);
+    // Token Rotation: Eski refresh token'ı kaldır ve yeni bir tane oluştur
+    user.refreshTokens = user.refreshTokens.filter(
+      (tokenObj) => tokenObj.token !== refreshToken
+    );
 
-    res.cookie("accessToken", newAccessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
-      maxAge: 60 * 60 * 1000,
-    });
+    const newAccessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken();
+
+    // Yeni refresh token'ı ekle
+    user.refreshTokens.push({ token: newRefreshToken });
+    
+    // Son 5 token'ı tut
+    if (user.refreshTokens.length > 5) {
+      user.refreshTokens = user.refreshTokens.slice(-5);
+    }
+
+    await user.save();
+
+    // Yeni token'ları cookie'ye yaz
+    sendTokenCookies(res, newAccessToken, newRefreshToken);
 
     res.status(200).json({
       message: "Token yenilendi",
       accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     });
   } catch (err) {
     res
       .status(401)
       .json({ message: "Geçersiz refresh token", error: err.message });
   }
+};
+
+// SÜRESİ DOLMUŞ TOKEN'LARI TEMİZLE
+export const cleanupExpiredTokens = async () => {
+  try {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    
+    const result = await User.updateMany(
+      {},
+      {
+        $pull: {
+          refreshTokens: {
+            createdAt: { $lt: thirtyDaysAgo }
+          }
+        }
+      }
+    );
+
+    console.log(`Temizlenen süresi dolmuş token sayısı: ${result.modifiedCount}`);
+    return result;
+  } catch (err) {
+    console.error("Token temizleme hatası:", err.message);
+    throw err;
+  }
+};
+
+// MANUEL TOKEN TEMİZLEME ENDPOİNTİ (Admin için)
+export const manualCleanupTokens = async (req, res) => {
+  try {
+    const result = await cleanupExpiredTokens();
+    
+    res.status(200).json({
+      message: "Süresi dolmuş token'lar başarıyla temizlendi",
+      modifiedCount: result.modifiedCount
+    });
+  } catch (err) {
+    res.status(500).json({ 
+      message: "Token temizleme hatası", 
+      error: err.message 
+    });
+  }
+};
+
+// OTOMATİK TOKEN TEMİZLEME (Cron Job için)
+export const scheduleTokenCleanup = () => {
+  // Her gün saat 02:00'da çalışacak şekilde ayarlayın
+  setInterval(async () => {
+    try {
+      await cleanupExpiredTokens();
+      console.log("Otomatik token temizleme tamamlandı:", new Date().toISOString());
+    } catch (err) {
+      console.error("Otomatik token temizleme hatası:", err.message);
+    }
+  }, 24 * 60 * 60 * 1000); // 24 saat
 };
 
 // GOOGLE AUTH CALLBACK

@@ -71,14 +71,14 @@ const features = [
 ];
 
 const badgeColors = {
-  "Güvenlik": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  "Yönetim": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  "Geliştirici": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
-  "Platform": "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
-  "Analitik": "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-  "Mobil": "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
-  "API": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  "Sosyal": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200"
+  "Güvenlik": "bg-black text-white dark:bg-white dark:text-black",
+  "Yönetim": "bg-green-500 text-white",
+  "Geliştirici": "bg-green-600 text-white",
+  "Platform": "bg-gray-500 text-white",
+  "Analitik": "bg-gray-600 text-white",
+  "Mobil": "bg-gray-700 text-white",
+  "API": "bg-gray-800 text-white",
+  "Sosyal": "bg-green-400 text-white"
 };
 
 export function Features() {
@@ -86,12 +86,12 @@ export function Features() {
     <section className="py-24 bg-gray-50 dark:bg-gray-900">
       <div className="container px-4 mx-auto">
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
+          <Badge variant="secondary" className="mb-4 bg-green-500 text-white">
             Özellikler
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl mb-4">
             Her İhtiyacınız İçin
-            <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> Güçlü Özellikler</span>
+            <span className="text-green-500"> Güçlü Özellikler</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Modern uygulamalar için tasarlanmış kapsamlı kimlik doğrulama ve yetkilendirme çözümü.
@@ -102,10 +102,10 @@ export function Features() {
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <Card key={index} className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+              <Card key={index} className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 bg-white dark:bg-black border border-gray-200 dark:border-gray-800">
                 <CardHeader>
                   <div className="flex items-center justify-between mb-2">
-                    <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg">
+                    <div className="p-3 bg-green-500 rounded-lg">
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <Badge 
@@ -115,14 +115,14 @@ export function Features() {
                       {feature.badge}
                     </Badge>
                   </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl text-black dark:text-white">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-base">
+                  <CardDescription className="text-base text-gray-600 dark:text-gray-300">
                     {feature.description}
                   </CardDescription>
                 </CardContent>
-                <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Card>
             );
           })}

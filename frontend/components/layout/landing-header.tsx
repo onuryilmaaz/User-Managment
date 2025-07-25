@@ -1,69 +1,43 @@
 "use client";
+
 import Link from "next/link";
-import { ThemeToggle } from "./theme-toggle";
-import { buttonVariants } from "@/components/ui/button";
-import { useAuthStore } from "@/lib/hooks/use-auth.store";
-import { UserNav } from "./user-nav";
+import { Button } from "@/components/ui/button";
 import { Zap } from "lucide-react";
 
 export function LandingHeader() {
-  const { user } = useAuthStore();
-  
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
-              <span className="hidden font-bold sm:inline-block text-xl">AuthFlow</span>
-            </div>
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 dark:bg-black/95 backdrop-blur-md">
+      <div className="container flex h-16 items-center justify-between px-4">
+        <Link href="/" className="flex items-center space-x-2">
+          <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+            <Zap className="h-4 w-4 text-white" />
+          </div>
+          <span className="font-bold text-xl text-green-500">AuthFlow</span>
+        </Link>
+        
+        <nav className="hidden md:flex items-center space-x-8">
+          <Link href="#features" className="text-gray-600 dark:text-gray-300 hover:text-green-500 transition-colors">
+            Özellikler
           </Link>
-        </div>
-
-        {/* Navigation Menu */}
-        {!user && (
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            <Link href="#features" className="transition-colors hover:text-foreground/80">
-              Özellikler
-            </Link>
-            <Link href="#pricing" className="transition-colors hover:text-foreground/80">
-              Fiyatlandırma
-            </Link>
-            <Link href="/docs" className="transition-colors hover:text-foreground/80">
-              Dokümantasyon
-            </Link>
-            <Link href="/contact" className="transition-colors hover:text-foreground/80">
-              İletişim
-            </Link>
-          </nav>
-        )}
-
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          {user ? (
-            <div className="flex items-center space-x-2">
-              <ThemeToggle />
-              <UserNav />
-            </div>
-          ) : (
-            <div className="flex items-center space-x-2">
-              <ThemeToggle />
-              <Link
-                href="/login"
-                className={buttonVariants({ variant: "ghost" })}
-              >
-                Giriş Yap
-              </Link>
-              <Link
-                href="/register"
-                className={buttonVariants({ variant: "default" })}
-              >
-                Ücretsiz Başla
-              </Link>
-            </div>
-          )}
+          <Link href="#pricing" className="text-gray-600 dark:text-gray-300 hover:text-green-500 transition-colors">
+            Fiyatlandırma
+          </Link>
+          <Link href="#contact" className="text-gray-600 dark:text-gray-300 hover:text-green-500 transition-colors">
+            İletişim
+          </Link>
+        </nav>
+        
+        <div className="flex items-center space-x-4">
+          <Link href="/login">
+            <Button variant="ghost" className="text-black dark:text-white hover:text-green-500">
+              Giriş Yap
+            </Button>
+          </Link>
+          <Link href="/register">
+            <Button className="bg-green-500 hover:bg-green-600 text-white">
+              Başlayın
+            </Button>
+          </Link>
         </div>
       </div>
     </header>

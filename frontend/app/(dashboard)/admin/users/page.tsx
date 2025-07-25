@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuthStore } from "@/lib/hooks/use-auth.store";
+import { useRouter } from "next/navigation";
 import {
   getUserList,
   deleteUser,
   toggleUserStatus,
   changeUserRole,
 } from "@/lib/services/user.service";
+import { toast } from "sonner";
+import Swal from "sweetalert2";
 import {
   Card,
   CardContent,
@@ -49,8 +51,7 @@ import {
   UserCheck,
   User,
 } from "lucide-react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/hooks/use-auth.store";
 
 interface UserData {
   _id: string;
@@ -62,31 +63,6 @@ interface UserData {
   isVerified: boolean;
   createdAt: string;
   lastLogin?: string;
-}
-
-interface CurrentUser {
-  id: string;
-  _id?: string;
-  name: string;
-  surname?: string;
-  username?: string;
-  email: string;
-  role: "User" | "Moderator" | "Admin";
-  isVerified: boolean;
-  isActive: boolean;
-  profilePicture?: string;
-  bio?: string;
-  phone?: string;
-  location?: {
-    country?: string;
-    city?: string;
-  };
-  social?: {
-    github?: string;
-    twitter?: string;
-    linkedin?: string;
-    website?: string;
-  };
 }
 
 export default function AdminUsersPage() {
@@ -135,18 +111,49 @@ export default function AdminUsersPage() {
       return;
     }
 
-    if (!confirm("Bu kullanıcıyı silmek istediğinizden emin misiniz?")) return;
+    // SweetAlert ile onay al
+    const result = await Swal.fire({
+      title: "Kullanıcıyı Sil",
+      text: "Bu kullanıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Evet, Sil!",
+      cancelButtonText: "İptal",
+      background: "var(--background)",
+      color: "var(--foreground)",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       await deleteUser(userId);
-      toast.success("Kullanıcı başarıyla silindi");
+
+      // Başarı mesajı
+      await Swal.fire({
+        title: "Silindi!",
+        text: "Kullanıcı başarıyla silindi.",
+        icon: "success",
+        confirmButtonColor: "#22c55e",
+        background: "var(--background)",
+        color: "var(--foreground)",
+      });
+
       loadUsers();
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Kullanıcı silinirken hata oluştu"
-      );
+      // Hata mesajı
+      await Swal.fire({
+        title: "Hata!",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Kullanıcı silinirken hata oluştu",
+        icon: "error",
+        confirmButtonColor: "#ef4444",
+        background: "var(--background)",
+        color: "var(--foreground)",
+      });
     }
   };
 
@@ -158,16 +165,57 @@ export default function AdminUsersPage() {
       return;
     }
 
+    // Kullanıcının mevcut durumunu bul
+    const user = users.find((u) => u._id === userId);
+    const newStatus = user?.isActive ? "pasif" : "aktif";
+
+    // SweetAlert ile onay al
+    const result = await Swal.fire({
+      title: `Kullanıcıyı ${
+        newStatus.charAt(0).toUpperCase() + newStatus.slice(1)
+      } Yap`,
+      text: `Bu kullanıcıyı ${newStatus} yapmak istediğinizden emin misiniz?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: newStatus === "aktif" ? "#22c55e" : "#f59e0b",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: `Evet, ${
+        newStatus.charAt(0).toUpperCase() + newStatus.slice(1)
+      } Yap!`,
+      cancelButtonText: "İptal",
+      background: "var(--background)",
+      color: "var(--foreground)",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       await toggleUserStatus(userId);
-      toast.success("Kullanıcı durumu güncellendi");
+
+      // Başarı mesajı
+      await Swal.fire({
+        title: "Güncellendi!",
+        text: `Kullanıcı durumu ${newStatus} olarak güncellendi.`,
+        icon: "success",
+        confirmButtonColor: "#22c55e",
+        background: "var(--background)",
+        color: "var(--foreground)",
+      });
+
       loadUsers();
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Durum değiştirilirken hata oluştu"
-      );
+      // Hata mesajı
+      await Swal.fire({
+        title: "Hata!",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Durum değiştirilirken hata oluştu",
+        icon: "error",
+        confirmButtonColor: "#ef4444",
+        background: "var(--background)",
+        color: "var(--foreground)",
+      });
     }
   };
 
@@ -198,7 +246,7 @@ export default function AdminUsersPage() {
   // Helper function to get current user ID
   const getCurrentUserId = () => {
     if (!currentUser) return null;
-    return (currentUser as CurrentUser)._id || currentUser.id;
+    return currentUser._id;
   };
 
   // Rol değiştirme yetkisi kontrolü

@@ -1,40 +1,35 @@
 "use client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Star } from "lucide-react";
-import Link from "next/link";
+import { Check } from "lucide-react";
 
 const plans = [
   {
     name: "Başlangıç",
     price: "Ücretsiz",
-    description: "Küçük projeler için mükemmel",
+    description: "Küçük projeler için ideal",
     features: [
       "1,000 aylık aktif kullanıcı",
       "Temel kimlik doğrulama",
       "E-posta desteği",
-      "Temel analitik",
-      "Sosyal giriş (2 platform)"
+      "Temel analitik"
     ],
-    cta: "Ücretsiz Başla",
     popular: false
   },
   {
     name: "Profesyonel",
-    price: "$29",
-    period: "/ay",
+    price: "₺299",
     description: "Büyüyen işletmeler için",
     features: [
       "10,000 aylık aktif kullanıcı",
       "Gelişmiş güvenlik özellikleri",
-      "Rol tabanlı erişim kontrolü",
+      "2FA desteği",
       "Öncelikli destek",
-      "Tüm sosyal giriş seçenekleri",
-      "API erişimi",
-      "Özel branding"
+      "Detaylı analitik",
+      "API erişimi"
     ],
-    cta: "Profesyonel'i Seç",
     popular: true
   },
   {
@@ -43,32 +38,30 @@ const plans = [
     description: "Büyük organizasyonlar için",
     features: [
       "Sınırsız kullanıcı",
-      "Özel güvenlik yapılandırması",
+      "Özel entegrasyonlar",
       "Dedicated support",
       "SLA garantisi",
-      "On-premise deployment",
-      "Özel entegrasyonlar",
-      "Compliance sertifikaları"
+      "Özel raporlama",
+      "On-premise seçeneği"
     ],
-    cta: "İletişime Geç",
     popular: false
   }
 ];
 
 export function Pricing() {
   return (
-    <section className="py-24">
+    <section className="py-24 bg-gray-50 dark:bg-gray-900">
       <div className="container px-4 mx-auto">
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
+          <Badge variant="secondary" className="mb-4 bg-green-500 text-white">
             Fiyatlandırma
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl mb-4">
-            Her Bütçeye Uygun
-            <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> Çözümler</span>
+            Size Uygun
+            <span className="text-green-500"> Çözümler</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            İhtiyaçlarınıza göre ölçeklenen esnek fiyatlandırma seçenekleri.
+            İhtiyaçlarınıza göre tasarlanmış esnek fiyatlandırma seçenekleri.
           </p>
         </div>
         
@@ -76,24 +69,25 @@ export function Pricing() {
           {plans.map((plan, index) => (
             <Card 
               key={index} 
-              className={`relative ${plan.popular ? 'border-green-500 shadow-lg scale-105' : ''}`}
+              className={`relative ${plan.popular ? 'border-green-500 shadow-xl scale-105' : 'border-gray-200 dark:border-gray-800'} bg-white dark:bg-black`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-1">
-                    <Star className="w-4 h-4 mr-1" />
+                  <Badge className="bg-green-500 text-white px-4 py-1">
                     En Popüler
                   </Badge>
                 </div>
               )}
               
               <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                <CardTitle className="text-2xl font-bold text-black dark:text-white">{plan.name}</CardTitle>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">{plan.price}</span>
-                  {plan.period && <span className="text-gray-500">{plan.period}</span>}
+                  <span className="text-4xl font-bold text-black dark:text-white">{plan.price}</span>
+                  {plan.price !== "Ücretsiz" && plan.price !== "Özel" && (
+                    <span className="text-gray-600 dark:text-gray-400">/ay</span>
+                  )}
                 </div>
-                <CardDescription className="text-base mt-2">
+                <CardDescription className="mt-2 text-gray-600 dark:text-gray-300">
                   {plan.description}
                 </CardDescription>
               </CardHeader>
@@ -102,20 +96,18 @@ export function Pricing() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-center">
-                      <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                      <span className="text-sm">{feature}</span>
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-600 dark:text-gray-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 
-                <Link href={plan.name === 'Kurumsal' ? '/contact' : '/register'}>
-                  <Button 
-                    className={`w-full ${plan.popular ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700' : ''}`}
-                    variant={plan.popular ? 'default' : 'outline'}
-                  >
-                    {plan.cta}
-                  </Button>
-                </Link>
+                <Button 
+                  className={`w-full ${plan.popular ? 'bg-green-500 hover:bg-green-600 text-white' : 'border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-900'}`}
+                  size="lg"
+                >
+                  {plan.price === "Özel" ? "İletişime Geçin" : "Başlayın"}
+                </Button>
               </CardContent>
             </Card>
           ))}

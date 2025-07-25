@@ -30,11 +30,12 @@ export const updateProfile = async (req, res) => {
     const user = req.user;
 
     // Gelen isteğin body'sinden `profilePicture`'ı da alıyoruz
-    const { name, surname, bio, location, social, profilePicture } = req.body;
+    const { name, surname, bio, location, social, profilePicture, phone } = req.body;
 
     if (name) user.name = name;
     if (surname) user.surname = surname;
     if (bio) user.bio = bio;
+    if (phone) user.phone = phone; // Phone alanı eklendi
     if (location) user.location = location;
     if (social) user.social = social;
 
