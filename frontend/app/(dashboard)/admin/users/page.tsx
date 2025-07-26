@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../../components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "../../../../components/ui/badge";
 import {
@@ -56,6 +57,7 @@ import { useAuthStore } from "@/lib/hooks/use-auth.store";
 interface UserData {
   _id: string;
   name: string;
+  profilePicture?: string;
   surname?: string;
   email: string;
   role: "User" | "Moderator" | "Admin";
@@ -311,6 +313,7 @@ export default function AdminUsersPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead></TableHead>
                 <TableHead>Kullanıcı</TableHead>
                 <TableHead>E-posta</TableHead>
                 <TableHead>Rol</TableHead>
@@ -324,22 +327,32 @@ export default function AdminUsersPage() {
               {users.map((user) => (
                 <TableRow key={user._id}>
                   <TableCell>
+                    <Avatar className="h-10 w-10 ring-2 ring-green-500/50 ring-offset-2 ring-offset-white dark:ring-offset-black">
+                      <AvatarImage src={user?.profilePicture} />
+                      <AvatarFallback className="bg-gradient-to-br from-green-400 to-green-600 text-white font-semibold">
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TableCell>
+                  <TableCell>
                     <div>
                       <div className="font-medium">
                         {user.name} {user.surname}
                       </div>
-                      {user.isVerified ? (
-                        <Badge variant="secondary" className="text-xs">
-                          Doğrulanmış
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive" className="text-xs">
-                          Doğrulanmamış
-                        </Badge>
-                      )}
                     </div>
                   </TableCell>
-                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    {user.email}{" "}
+                    {user.isVerified ? (
+                      <Badge className="bg-green-500 text-white text-xs">
+                        Doğrulanmış
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-red-500 text-white text-xs">
+                        Doğrulanmamış
+                      </Badge>
+                    )}
+                  </TableCell>
                   <TableCell>
                     {canChangeRole(user) ? (
                       <Select
@@ -368,6 +381,7 @@ export default function AdminUsersPage() {
                       </Select>
                     ) : (
                       <Badge
+                        className="text-white"
                         variant={
                           user.role === "Admin"
                             ? "destructive"
@@ -390,7 +404,10 @@ export default function AdminUsersPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.isActive ? "default" : "secondary"}>
+                    <Badge
+                      className="text-white"
+                      variant={user.isActive ? "default" : "secondary"}
+                    >
                       {user.isActive ? "Aktif" : "Pasif"}
                     </Badge>
                   </TableCell>

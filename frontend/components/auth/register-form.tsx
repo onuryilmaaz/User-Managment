@@ -67,13 +67,13 @@ export function RegisterForm() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                    <FormLabel className="text-sm font-medium text-green-700 dark:text-green-300">
                       İsim
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Ahmet"
-                        className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                        className="h-10 border-green-200 dark:border-green-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
                         {...field}
                       />
                     </FormControl>
@@ -86,13 +86,13 @@ export function RegisterForm() {
                 name="surname"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                    <FormLabel className="text-sm font-medium text-green-700 dark:text-green-300">
                       Soyisim
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Yılmaz"
-                        className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                        className="h-10 border-green-200 dark:border-green-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
                         {...field}
                       />
                     </FormControl>
@@ -106,13 +106,13 @@ export function RegisterForm() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                  <FormLabel className="text-sm font-medium text-green-700 dark:text-green-300">
                     Kullanıcı Adı
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="ahmetyilmaz"
-                      className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                      className="h-10 border-blue-200 dark:border-green-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
                       {...field}
                     />
                   </FormControl>
@@ -125,13 +125,13 @@ export function RegisterForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                  <FormLabel className="text-sm font-medium text-green-700 dark:text-green-300">
                     E-posta
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="ahmet@example.com"
-                      className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                      className="h-10 border-green-200 dark:border-green-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
                       {...field}
                     />
                   </FormControl>
@@ -144,13 +144,13 @@ export function RegisterForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                  <FormLabel className="text-sm font-medium text-green-700 dark:text-green-300">
                     Şifre
                   </FormLabel>
                   <FormControl>
                     <PasswordInput
                       placeholder="••••••••"
-                      className="h-10 border-blue-200 dark:border-blue-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                      className="h-10 border-blue-200 dark:border-green-700 focus:border-green-500 dark:focus:border-green-400 transition-colors"
                       {...field}
                     />
                   </FormControl>

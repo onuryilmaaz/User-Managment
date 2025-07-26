@@ -214,3 +214,19 @@
       0 10px 10px -5px rgba(34, 197, 94, 0.04);
   }
 }
+
+/* Mevcut kodun sonuna ekleyin */
+
+/* Soft borders for better visual harmony */
+.soft-border {
+  border-color: rgb(243 244 246 / 0.6);
+}
+
+.dark .soft-border {
+  border-color: rgb(31 41 55 / 0.4);
+}
+
+/* Smooth transitions for all borders */
+* {
+  transition: border-color 0.2s ease-in-out;
+}

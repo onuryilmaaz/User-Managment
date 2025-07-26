@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // YENİ IMPORT
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImagePlus, Loader2 } from "lucide-react";
 import { useImageUpload } from "@/lib/hooks/use-image-upload";
 import {
@@ -39,6 +39,7 @@ import {
 
 // Ana Bileşen
 export function ProfileEditDialog() {
+  const [open, setOpen] = useState(false);
   const { user, setUser } = useAuthStore();
   const {
     previewUrl,
@@ -83,16 +84,26 @@ export function ProfileEditDialog() {
 
   async function onSubmit(values: UpdateProfilePayload) {
     try {
-      const response = await updateUserProfile(values);
-      setUser(response.user);
+      // Form validation ile surname ve username'in dolu olduğunu garanti ediyoruz
+      const validatedValues = {
+        ...values,
+        name: values.name || "",
+        surname: values.surname || "",
+        username: values.username || ""
+      };
+      
+      const response = await updateUserProfile(validatedValues);
+      setUser(response);
       toast.success("Profil başarıyla güncellendi!");
-    } catch (error: any) {
-      toast.error(error.message);
+      setOpen(false); // Modal'ı kapat
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Bir hata oluştu";
+      toast.error(errorMessage);
     }
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Profili Düzenle</Button>
       </DialogTrigger>

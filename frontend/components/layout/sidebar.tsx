@@ -57,18 +57,18 @@ export function Sidebar() {
   const canAccessAdmin = isAdmin || isModerator;
 
   return (
-    <div className="flex h-full w-64 flex-col bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800">
+    <div className="flex h-full w-64 flex-col bg-white/98 dark:bg-black/98 backdrop-blur-sm border-r border-gray-200/50 dark:border-gray-700/50">
       {/* Premium Logo/Brand */}
-      <div className="flex h-16 items-center px-6 border-b border-gray-200 dark:border-gray-800">
+      <div className="flex h-16 items-center px-6">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-green-500 flex items-center justify-center shadow-lg">
+          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg">
             <Zap className="h-4 w-4 text-white" />
           </div>
-          <div>
-            <span className="font-bold text-lg text-green-500">
+          <Link href={`/`}>
+            <span className="font-bold text-lg bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
               AuthFlow
             </span>
-          </div>
+          </Link>
         </div>
       </div>
 
@@ -82,10 +82,10 @@ export function Sidebar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200",
+                  "group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200",
                   isActive
-                    ? "bg-green-500 text-white shadow-lg"
-                    : "text-black dark:text-white hover:text-green-500 hover:bg-gray-50 dark:hover:bg-gray-900"
+                    ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25"
+                    : "text-gray-700 dark:text-gray-300 hover:text-green-600 hover:bg-gray-50/80 dark:hover:bg-gray-800/50"
                 )}
               >
                 <item.icon
@@ -93,7 +93,7 @@ export function Sidebar() {
                     "mr-3 h-5 w-5 transition-colors",
                     isActive
                       ? "text-white"
-                      : "text-gray-500 dark:text-gray-400 group-hover:text-green-500"
+                      : "text-gray-500 dark:text-gray-400 group-hover:text-green-600"
                   )}
                 />
                 {item.name}
@@ -118,18 +118,18 @@ export function Sidebar() {
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      "group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200",
+                      "group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200",
                       isActive
-                        ? "bg-black dark:bg-white text-white dark:text-black shadow-lg"
-                        : "text-black dark:text-white hover:text-green-500 hover:bg-gray-50 dark:hover:bg-gray-900"
+                        ? "bg-gradient-to-r from-gray-800 to-gray-900 dark:from-gray-100 dark:to-gray-200 text-white dark:text-gray-900 shadow-lg shadow-gray-800/25 dark:shadow-gray-200/25"
+                        : "text-gray-700 dark:text-gray-300 hover:text-green-600 hover:bg-gray-50/80 dark:hover:bg-gray-800/50"
                     )}
                   >
                     <item.icon
                       className={cn(
                         "mr-3 h-5 w-5 transition-colors",
                         isActive
-                          ? "text-white dark:text-black"
-                          : "text-gray-500 dark:text-gray-400 group-hover:text-green-500"
+                          ? "text-white dark:text-gray-900"
+                          : "text-gray-500 dark:text-gray-400 group-hover:text-green-600"
                       )}
                     />
                     {item.name}
@@ -142,28 +142,28 @@ export function Sidebar() {
       </nav>
 
       {/* Premium User Info Footer */}
-      <div className="border-t border-gray-200 dark:border-gray-800 p-4">
-        <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-          <Avatar className="h-10 w-10 ring-2 ring-green-500">
+      <div className="border-t border-gray-200/50 dark:border-gray-700/50 p-4 bg-gradient-to-t from-gray-50/30 to-transparent dark:from-gray-800/20">
+        <div className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-50/80 dark:hover:bg-gray-800/50 transition-colors">
+          <Avatar className="h-10 w-10 ring-2 ring-green-500/50 ring-offset-2 ring-offset-white dark:ring-offset-black">
             <AvatarImage src={user?.profilePicture} />
-            <AvatarFallback className="bg-green-500 text-white font-semibold">
+            <AvatarFallback className="bg-gradient-to-br from-green-400 to-green-600 text-white font-semibold">
               {user?.name?.charAt(0)?.toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-black dark:text-white truncate">
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
               {user?.name}
             </p>
             <div className="flex items-center space-x-1 mt-1">
               <Badge
                 variant="outline"
                 className={cn(
-                  "text-xs border-0",
+                  "text-xs border-0 shadow-sm",
                   user?.role === "Admin"
-                    ? "bg-black text-white dark:bg-white dark:text-black"
+                    ? "bg-gradient-to-r from-gray-800 to-gray-900 text-white dark:from-gray-100 dark:to-gray-200 dark:text-gray-900"
                     : user?.role === "Moderator"
-                    ? "bg-gray-500 text-white"
-                    : "bg-green-500 text-white"
+                    ? "bg-gradient-to-r from-gray-500 to-gray-600 text-white"
+                    : "bg-gradient-to-r from-green-500 to-green-600 text-white"
                 )}
               >
                 {user?.role === "Admin" && (

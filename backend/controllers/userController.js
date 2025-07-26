@@ -30,10 +30,20 @@ export const updateProfile = async (req, res) => {
     const user = req.user;
 
     // Gelen isteğin body'sinden `profilePicture`'ı da alıyoruz
-    const { name, surname, bio, location, social, profilePicture, phone } = req.body;
+    const {
+      name,
+      surname,
+      username,
+      bio,
+      location,
+      social,
+      profilePicture,
+      phone,
+    } = req.body;
 
     if (name) user.name = name;
     if (surname) user.surname = surname;
+    if (username) user.username = username;
     if (bio) user.bio = bio;
     if (phone) user.phone = phone; // Phone alanı eklendi
     if (location) user.location = location;
@@ -191,12 +201,13 @@ const validatePassword = (password) => {
   if (password.length < 8) {
     return "Şifre en az 8 karakter olmalı";
   }
-  
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
   if (!passwordRegex.test(password)) {
     return "Şifre en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir";
   }
-  
+
   return null;
 };
 

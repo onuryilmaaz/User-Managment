@@ -101,16 +101,16 @@ export default function DashboardPage() {
       {/* Quick Stats */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Hesap Durumu */}
-        <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
+        <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 backdrop-blur-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
               Hesap Durumu
             </CardTitle>
             <div
-              className={`p-2 rounded-lg ${
+              className={`p-2 rounded-xl shadow-sm ${
                 user.isVerified
-                  ? "bg-green-100 dark:bg-green-900/20"
-                  : "bg-yellow-100 dark:bg-yellow-900/20"
+                  ? "bg-gradient-to-br from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/20"
+                  : "bg-gradient-to-br from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-800/20"
               }`}
             >
               <UserCheck
@@ -135,12 +135,12 @@ export default function DashboardPage() {
         </Card>
 
         {/* Rol */}
-        <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
+        <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-900 dark:to-blue-900/10 backdrop-blur-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
               Yetki Seviyesi
             </CardTitle>
-            <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/20">
+            <div className="p-2 rounded-xl shadow-sm bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20">
               {user.role === "Admin" ? (
                 <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               ) : user.role === "Moderator" ? (
@@ -165,12 +165,12 @@ export default function DashboardPage() {
         {/* Admin/Moderatör İstatistikleri */}
         {isAdminOrModerator && (
           <>
-            <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-purple-50/30 dark:from-gray-900 dark:to-purple-900/10 backdrop-blur-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Toplam Kullanıcı
                 </CardTitle>
-                <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/20">
+                <div className="p-2 rounded-xl shadow-sm bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-800/20">
                   <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                 </div>
               </CardHeader>
@@ -182,12 +182,12 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-emerald-50/30 dark:from-gray-900 dark:to-emerald-900/10 backdrop-blur-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Aktif Kullanıcı
                 </CardTitle>
-                <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/20">
+                <div className="p-2 rounded-xl shadow-sm bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-800/20">
                   <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 </div>
               </CardHeader>
@@ -203,19 +203,19 @@ export default function DashboardPage() {
 
         {/* Normal kullanıcılar için son aktivite */}
         {!isAdminOrModerator && (
-          <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
+          <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-orange-50/30 dark:from-gray-900 dark:to-orange-900/10 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 Son Aktivite
               </CardTitle>
-              <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+              <div className="p-2 rounded-xl shadow-sm bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20">
                 <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
               </div>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">Bugün</div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Dashboard`a giriş yaptınız
+                Dashboarda giriş yaptınız
               </p>
             </CardContent>
           </Card>
@@ -224,19 +224,19 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="border-0 shadow-md">
+        <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-blue-50/20 dark:from-gray-900 dark:to-blue-900/10 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5 text-blue-600" />
               Hesap İşlemleri
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="space-y-4">
             <div className="space-y-3">
               <Link href="/profile">
                 <Button
                   variant="outline"
-                  className="w-full justify-start h-12 hover:bg-blue-50 dark:hover:bg-blue-950/20"
+                  className="w-full justify-start h-12 border-0 bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 hover:from-blue-100 hover:to-blue-200/70 dark:hover:from-blue-900/50 dark:hover:to-blue-800/30 transition-all duration-300 shadow-sm hover:shadow-md"
                 >
                   <User className="mr-3 h-4 w-4" />
                   <div className="text-left">
@@ -252,7 +252,7 @@ export default function DashboardPage() {
               <Link href="/settings">
                 <Button
                   variant="outline"
-                  className="w-full justify-start h-12 hover:bg-blue-50 dark:hover:bg-blue-950/20"
+                  className="w-full justify-start h-12 border-0 bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 hover:from-blue-100 hover:to-blue-200/70 dark:hover:from-blue-900/50 dark:hover:to-blue-800/30 transition-all duration-300 shadow-sm hover:shadow-md"
                 >
                   <Settings className="mr-3 h-4 w-4" />
                   <div className="text-left">
@@ -269,19 +269,19 @@ export default function DashboardPage() {
 
         {/* Admin/Moderatör Hızlı İşlemler */}
         {isAdminOrModerator && (
-          <Card className="border-0 shadow-md">
+          <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-purple-50/20 dark:from-gray-900 dark:to-purple-900/10 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-purple-600" />
                 Yönetim Paneli
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4">
               <div className="space-y-3">
                 <Link href="/admin/users">
                   <Button
                     variant="outline"
-                    className="w-full justify-start h-12 hover:bg-purple-50 dark:hover:bg-purple-950/20"
+                    className="w-full justify-start h-12 border-0 bg-gradient-to-r from-purple-50 to-purple-100/50 dark:from-purple-950/30 dark:to-purple-900/20 hover:from-purple-100 hover:to-purple-200/70 dark:hover:from-purple-900/50 dark:hover:to-purple-800/30 transition-all duration-300 shadow-sm hover:shadow-md"
                   >
                     <Users className="mr-3 h-4 w-4" />
                     <div className="text-left">
@@ -298,7 +298,7 @@ export default function DashboardPage() {
                   <Link href="/admin/settings">
                     <Button
                       variant="outline"
-                      className="w-full justify-start h-12 hover:bg-purple-50 dark:hover:bg-purple-950/20"
+                      className="w-full justify-start h-12 border-0 bg-gradient-to-r from-purple-50 to-purple-100/50 dark:from-purple-950/30 dark:to-purple-900/20 hover:from-purple-100 hover:to-purple-200/70 dark:hover:from-purple-900/50 dark:hover:to-purple-800/30 transition-all duration-300 shadow-sm hover:shadow-md"
                     >
                       <ShieldCheck className="mr-3 h-4 w-4" />
                       <div className="text-left">

@@ -22,10 +22,10 @@ export default function RegisterPage() {
             />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-black dark:text-white">
+        <h1 className="text-2xl font-bold text-green-500 dark:text-white">
           Hesabını Oluştur
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-green-600 dark:text-green-400">
           Hızlıca hesabını oluştur ve başla
         </p>
       </div>
@@ -53,7 +53,9 @@ export default function RegisterPage() {
       {/* Footer Links - Yeşil Tema */}
       <div className="text-center">
         <div className="text-sm">
-          <span className="text-gray-600 dark:text-gray-400">Zaten hesabın var mı? </span>
+          <span className="text-gray-600 dark:text-gray-400">
+            Zaten hesabın var mı?{" "}
+          </span>
           <Link
             href="/login"
             className="text-green-500 font-semibold hover:text-green-600 transition-all duration-200"
