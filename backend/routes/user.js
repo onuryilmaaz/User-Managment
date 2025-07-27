@@ -14,11 +14,8 @@ import { authorizeRoles } from "../middleware/authorizeRoles.js";
 
 const router = express.Router();
 
-// Kullanıcı profil işlemleri
 router.get("/me", protect, getMe);
 router.put("/update-profile", protect, updateProfile);
-
-// Resim Upload
 router.post("/upload-image", upload.single("image"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
@@ -29,7 +26,6 @@ router.post("/upload-image", upload.single("image"), (req, res) => {
   res.status(200).json({ imageUrl });
 });
 
-// Admin ve Moderatör işlemleri
 router.get("/list", protect, authorizeRoles("Admin", "Moderator"), getUserList);
 router.delete(
   "/delete/:id",
@@ -44,7 +40,6 @@ router.patch(
   toggleUserStatus
 );
 
-// Sadece Admin işlemleri
 router.patch(
   "/change-role/:id",
   protect,
@@ -52,7 +47,6 @@ router.patch(
   changeUserRole
 );
 
-// Şifre değiştirme
 router.put("/change-password", protect, changePassword);
 
 export default router;

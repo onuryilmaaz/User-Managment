@@ -132,9 +132,8 @@ export const loginUser = async (req, res) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken();
 
-    // Eski refresh token'ları temizle (son 5 tanesini tut)
-    if (user.refreshTokens.length >= 5) {
-      user.refreshTokens = user.refreshTokens.slice(-4); // Son 4 tanesini tut
+    if (user.refreshTokens.length >= 3) {
+      user.refreshTokens = user.refreshTokens.slice(-2); // Son 4 tanesini tut
     }
 
     user.refreshTokens.push({ token: refreshToken });
@@ -193,9 +192,8 @@ export const verifyCode = async (req, res) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken();
 
-    // Son 5 token'ı tut
-    if (user.refreshTokens.length >= 5) {
-      user.refreshTokens = user.refreshTokens.slice(-4);
+    if (user.refreshTokens.length >= 3) {
+      user.refreshTokens = user.refreshTokens.slice(-2);
     }
 
     user.refreshTokens.push({ token: refreshToken });
@@ -311,13 +309,11 @@ export const resetPasswordWithCode = async (req, res) => {
       });
     }
 
-    // Şifre validasyonu - düzeltildi
     const passwordError = validatePassword(newPassword);
     if (passwordError) {
       return res.status(400).json({ message: passwordError });
     }
 
-    // Kod doğrulaması burada yapılıyor zaten
     const user = await User.findOne({
       email,
       resetCode: code,
@@ -335,7 +331,6 @@ export const resetPasswordWithCode = async (req, res) => {
     user.resetCode = undefined;
     user.resetCodeExpire = undefined;
 
-    // Güvenlik için tüm refresh token'ları temizle
     user.refreshTokens = [];
 
     await user.save();
@@ -389,7 +384,6 @@ export const refreshToken = async (req, res) => {
       return res.status(401).json({ message: "Geçersiz refresh token" });
     }
 
-    // Token Rotation: Eski refresh token'ı kaldır ve yeni bir tane oluştur
     user.refreshTokens = user.refreshTokens.filter(
       (tokenObj) => tokenObj.token !== refreshToken
     );
@@ -397,17 +391,14 @@ export const refreshToken = async (req, res) => {
     const newAccessToken = generateAccessToken(user);
     const newRefreshToken = generateRefreshToken();
 
-    // Yeni refresh token'ı ekle
     user.refreshTokens.push({ token: newRefreshToken });
-    
-    // Son 5 token'ı tut
-    if (user.refreshTokens.length > 5) {
-      user.refreshTokens = user.refreshTokens.slice(-5);
+
+    if (user.refreshTokens.length > 3) {
+      user.refreshTokens = user.refreshTokens.slice(-3);
     }
 
     await user.save();
 
-    // Yeni token'ları cookie'ye yaz
     sendTokenCookies(res, newAccessToken, newRefreshToken);
 
     res.status(200).json({
@@ -426,19 +417,21 @@ export const refreshToken = async (req, res) => {
 export const cleanupExpiredTokens = async () => {
   try {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    
+
     const result = await User.updateMany(
       {},
       {
         $pull: {
           refreshTokens: {
-            createdAt: { $lt: thirtyDaysAgo }
-          }
-        }
+            createdAt: { $lt: thirtyDaysAgo },
+          },
+        },
       }
     );
 
-    console.log(`Temizlenen süresi dolmuş token sayısı: ${result.modifiedCount}`);
+    console.log(
+      `Temizlenen süresi dolmuş token sayısı: ${result.modifiedCount}`
+    );
     return result;
   } catch (err) {
     console.error("Token temizleme hatası:", err.message);
@@ -450,26 +443,28 @@ export const cleanupExpiredTokens = async () => {
 export const manualCleanupTokens = async (req, res) => {
   try {
     const result = await cleanupExpiredTokens();
-    
+
     res.status(200).json({
       message: "Süresi dolmuş token'lar başarıyla temizlendi",
-      modifiedCount: result.modifiedCount
+      modifiedCount: result.modifiedCount,
     });
   } catch (err) {
-    res.status(500).json({ 
-      message: "Token temizleme hatası", 
-      error: err.message 
+    res.status(500).json({
+      message: "Token temizleme hatası",
+      error: err.message,
     });
   }
 };
 
 // OTOMATİK TOKEN TEMİZLEME (Cron Job için)
 export const scheduleTokenCleanup = () => {
-  // Her gün saat 02:00'da çalışacak şekilde ayarlayın
   setInterval(async () => {
     try {
       await cleanupExpiredTokens();
-      console.log("Otomatik token temizleme tamamlandı:", new Date().toISOString());
+      console.log(
+        "Otomatik token temizleme tamamlandı:",
+        new Date().toISOString()
+      );
     } catch (err) {
       console.error("Otomatik token temizleme hatası:", err.message);
     }

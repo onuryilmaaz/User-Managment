@@ -11,7 +11,6 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "/api/auth/google/callback",
-      // Bu parametreler hesap seçimini zorlar
       authorizationParams: {
         prompt: "select_account",
         access_type: "offline",
@@ -19,24 +18,20 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Önce Google ID ile kullanıcı ara
         let existingUser = await User.findOne({ googleId: profile.id });
 
         if (existingUser) {
           return done(null, existingUser);
         }
 
-        // Google ID bulunamadıysa, email ile ara
         const emailUser = await User.findOne({
           email: profile.emails[0].value,
         });
 
         if (emailUser) {
-          // Mevcut hesabı Google hesabı ile eşleştir
           emailUser.googleId = profile.id;
           emailUser.isVerified = true;
 
-          // Profil bilgilerini güncelle (eğer boşsa)
           if (!emailUser.profilePicture && profile.photos[0]) {
             emailUser.profilePicture = profile.photos[0].value;
           }
@@ -45,7 +40,6 @@ passport.use(
           return done(null, emailUser);
         }
 
-        // Hiç kullanıcı yoksa yeni oluştur
         const newUser = new User({
           googleId: profile.id,
           email: profile.emails[0].value,

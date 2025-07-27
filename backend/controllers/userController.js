@@ -29,7 +29,6 @@ export const updateProfile = async (req, res) => {
   try {
     const user = req.user;
 
-    // Gelen isteğin body'sinden `profilePicture`'ı da alıyoruz
     const {
       name,
       surname,
@@ -45,17 +44,14 @@ export const updateProfile = async (req, res) => {
     if (surname) user.surname = surname;
     if (username) user.username = username;
     if (bio) user.bio = bio;
-    if (phone) user.phone = phone; // Phone alanı eklendi
+    if (phone) user.phone = phone;
     if (location) user.location = location;
     if (social) user.social = social;
 
-    // Eğer frontend'den bir profilePicture URL'i geldiyse, onu kullanıcıya ata
-    // Eğer gelmediyse, mevcut değeri koru
     if (typeof profilePicture !== "undefined") {
       user.profilePicture = profilePicture;
     }
 
-    // Değişiklikleri veritabanına kaydet
     const updatedUser = await user.save();
 
     res.status(200).json({ message: "Profil güncellendi", user: updatedUser });
@@ -81,7 +77,6 @@ export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Kendi kendini silmeyi engelle
     if (req.user._id.toString() === id) {
       return res.status(400).json({ message: "Kendi hesabınızı silemezsiniz" });
     }
@@ -91,7 +86,6 @@ export const deleteUser = async (req, res) => {
       return res.status(404).json({ message: "Kullanıcı bulunamadı" });
     }
 
-    // Moderatör admin'i silemez
     if (req.user.role === "Moderator" && userToDelete.role === "Admin") {
       return res
         .status(403)
@@ -110,7 +104,6 @@ export const toggleUserStatus = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Kendi durumunu değiştirmeyi engelle
     if (req.user._id.toString() === id) {
       return res
         .status(400)
@@ -122,7 +115,6 @@ export const toggleUserStatus = async (req, res) => {
       return res.status(404).json({ message: "Kullanıcı bulunamadı" });
     }
 
-    // Moderatör admin'in durumunu değiştiremez
     if (req.user.role === "Moderator" && userToUpdate.role === "Admin") {
       return res.status(403).json({
         message: "Moderatör admin kullanıcılarının durumunu değiştiremez",
@@ -152,14 +144,12 @@ export const changeUserRole = async (req, res) => {
     const { id } = req.params;
     const { role } = req.body;
 
-    // Geçerli roller kontrolü
     if (!["User", "Moderator"].includes(role)) {
       return res.status(400).json({
         message: "Geçersiz rol. Sadece 'User' veya 'Moderator' olabilir",
       });
     }
 
-    // Kendi rolünü değiştirmeyi engelle
     if (req.user._id.toString() === id) {
       return res
         .status(400)
@@ -171,7 +161,6 @@ export const changeUserRole = async (req, res) => {
       return res.status(404).json({ message: "Kullanıcı bulunamadı" });
     }
 
-    // Admin rolünü değiştirmeyi engelle
     if (userToUpdate.role === "Admin") {
       return res
         .status(403)
@@ -223,7 +212,6 @@ export const changePassword = async (req, res) => {
       });
     }
 
-    // Şifre validasyonu
     const passwordError = validatePassword(newPassword);
     if (passwordError) {
       return res.status(400).json({ message: passwordError });
@@ -235,13 +223,11 @@ export const changePassword = async (req, res) => {
       });
     }
 
-    // Kullanıcıyı bul (şifre dahil)
     const user = await User.findById(userId).select("+password");
     if (!user) {
       return res.status(404).json({ message: "Kullanıcı bulunamadı" });
     }
 
-    // Mevcut şifreyi kontrol et
     const isCurrentPasswordValid = await bcrypt.compare(
       currentPassword,
       user.password
@@ -250,10 +236,8 @@ export const changePassword = async (req, res) => {
       return res.status(400).json({ message: "Mevcut şifre hatalı" });
     }
 
-    // Yeni şifreyi hash'le
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
-    // Şifreyi güncelle
     user.password = hashedNewPassword;
     await user.save();
 
