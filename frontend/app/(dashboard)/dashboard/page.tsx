@@ -935,7 +935,7 @@ export default function DashboardPage() {
                   <CardContent className="relative z-10 space-y-4">
                     <div className="space-y-2">
                       <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                        3/5
+                        5/5
                       </div>
                       <p className="text-sm text-slate-500 dark:text-slate-400">
                         Profil tamamlama oranı
@@ -944,12 +944,14 @@ export default function DashboardPage() {
 
                     <div className="space-y-2">
                       <Progress
-                        value={60}
+                        value={100}
                         className="h-2 bg-slate-200 dark:bg-slate-700"
                       />
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-slate-500">İlerleme</span>
-                        <span className="font-semibold text-teal-600">60%</span>
+                        <span className="font-semibold text-teal-600">
+                          100%
+                        </span>
                       </div>
                     </div>
                   </CardContent>

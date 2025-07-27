@@ -14,12 +14,14 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen">
       <LandingHeader />
-      <Hero />
-      <Features />
-      <Pricing />
-      <CTA />
+      <main>
+        <Hero />
+        <Features />
+        <Pricing />
+        <CTA />
+      </main>
       <LandingFooter />
     </div>
   );
